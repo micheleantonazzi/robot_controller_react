@@ -1,12 +1,11 @@
 import React from 'react';
-import {Button, Modal, StyleSheet, Text} from 'react-native';
+import {Button, Modal, StyleSheet, Text, View} from 'react-native';
 
 const RosConnectionModal = props => {
   return (
-    <Modal visible={props.visible} animationType={props.animationType}>
+    <View>
       <Text>Ciao</Text>
-      <Button title={'Hide'} onPress={() => props.onHide()} />
-    </Modal>
+    </View>
   );
 };
 

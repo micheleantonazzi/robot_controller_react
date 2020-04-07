@@ -1,19 +1,23 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
+import 'react-native-gesture-handler';
 import React from 'react';
-import {StyleSheet, View, StatusBar} from 'react-native';
+import {StyleSheet, StatusBar} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import MainScreen from './components/screens/MainScreen';
+import RosConnectionModal from './components/screens/RosConnectionModal';
 
-const App: () => React$Node = () => {
+const Stack = createStackNavigator();
+
+const App = () => {
   return (
     <>
-      <StatusBar backgroundColor={'black'} barStyle={'default'} />
-      <View />
+      <StatusBar barStyle={'dark-content'} />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Connection" component={RosConnectionModal} />
+          <Stack.Screen name="Robot Controller" component={MainScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 };
