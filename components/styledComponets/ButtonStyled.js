@@ -10,6 +10,7 @@ const ButtonStyled = props => {
       onPress={props.onPress}
       style={{...props.style}}
       color={theme.colors.primary}
+      disabled={props.disabled}
     />
   );
 };

@@ -12,6 +12,8 @@ const TextInputStyled = props => {
         color: theme.colors.inputText,
         ...props.style,
       }}
+      value={props.value}
+      onChangeText={props.onChangeText}
     />
   );
 };
