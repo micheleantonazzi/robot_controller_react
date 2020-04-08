@@ -1,14 +1,20 @@
-import React from "react";
-import {Button, StyleSheet, Text, View} from "react-native";
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 
 const MainScreen = props => {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={styles.mainViewStyle}>
       <Text>Home Screen</Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  mainViewStyle: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default MainScreen;
