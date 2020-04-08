@@ -4,26 +4,25 @@ import {StyleSheet, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MainScreen from './components/screens/MainScreen';
-import RosConnectionModal from './components/screens/RosConnectionModal';
+import RosConnectionScreen from './components/screens/RosConnectionScreen';
 import {AppThemeDark} from './components/themes/AppThemeDark';
+import AppThemeContext from './components/contexts/AppThemeContext';
 
 const Stack = createStackNavigator();
-const AppTheme = AppThemeDark;
 
 const App = () => {
+  const theme = AppThemeDark;
   return (
-    <>
-      <StatusBar backgroundColor={AppTheme.colors.statusBar} />
-      <NavigationContainer theme={AppThemeDark}>
+    <AppThemeContext.Provider value={theme}>
+      <StatusBar />
+      <NavigationContainer theme={theme}>
         <Stack.Navigator>
-          <Stack.Screen name="Connection" component={RosConnectionModal} />
+          <Stack.Screen name="Connection" component={RosConnectionScreen} />
           <Stack.Screen name="Robot Controller" component={MainScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </AppThemeContext.Provider>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;
