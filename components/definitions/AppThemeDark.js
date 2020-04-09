@@ -1,6 +1,7 @@
 export const AppThemeDark = {
   colors: {
-    primary: '#0eab9a',
+    primary: '#45a4f4',
+    secondary: '#0eab9a',
     background: '#101d25',
     card: '#232d36',
     text: '#8f969e',
