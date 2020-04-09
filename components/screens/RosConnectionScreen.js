@@ -18,25 +18,28 @@ const RosConnectionScreen = props => {
 
   const urlValidator = address => {
     return address.match(
-      /(http(s)?:\/\/)([0-9]{1,3}\.){3}([0-9]{1,3}:[0-9]{1,4})/,
+      /^(http(s)?:\/\/)([0-9]{1,3}\.){3}([0-9]{1,3}:[0-9]{1,4})$/g,
     );
   };
+
   const connectToRos = address => {
-    var ros = new ROSLIB.Ros({
-      url: address,
-    });
+    if (urlValidator(address) !== null) {
+      var ros = new ROSLIB.Ros({
+        url: address,
+      });
 
-    ros.on('connection', function() {
-      console.log('Connected to websocket server.');
-    });
+      ros.on('connection', function() {
+        console.log('Connected to websocket server.');
+      });
 
-    ros.on('error', function(error) {
-      console.log('Error connecting to websocket server: ', error);
-    });
+      ros.on('error', function(error) {
+        console.log('Error connecting to websocket server: ', error);
+      });
 
-    ros.on('close', function() {
-      console.log('Connection to websocket server closed.');
-    });
+      ros.on('close', function() {
+        console.log('Connection to websocket server closed.');
+      });
+    }
   };
   return (
     <TouchableWithoutFeedback
@@ -47,6 +50,7 @@ const RosConnectionScreen = props => {
         <TextInputStyled
           style={styles.textInputAddressStyle}
           value={rosIp}
+          autoCapitalize={'none'}
           onChangeText={newText => {
             if (urlValidator(newText) !== null) {
               setIsDisabled(false);
@@ -60,7 +64,8 @@ const RosConnectionScreen = props => {
           <ButtonStyled
             title={'Connect'}
             onPress={() => {
-              urlValidator(rosIp);
+              Keyboard.dismiss();
+              connectToRos(rosIp);
             }}
             disabled={isDisabled}
           />
@@ -78,7 +83,8 @@ const styles = StyleSheet.create({
   },
   textInputAddressStyle: {
     borderBottomWidth: 2,
-    fontSize: 17,
+    fontSize: 18,
+    textAlign: 'center',
   },
   buttonBoxStyle: {
     margin: 20,
