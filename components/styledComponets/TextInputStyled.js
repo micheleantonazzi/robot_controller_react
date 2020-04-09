@@ -7,13 +7,12 @@ const TextInputStyled = props => {
 
   return (
     <TextInput
+      {...props}
       style={{
         borderColor: theme.colors.border,
         color: theme.colors.inputText,
         ...props.style,
       }}
-      value={props.value}
-      onChangeText={props.onChangeText}
     />
   );
 };
