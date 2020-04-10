@@ -23,7 +23,7 @@ const App = () => {
         <NavigationContainer theme={theme}>
           <Stack.Navigator>
             <Stack.Screen name="Connection" component={RosConnectionScreen} />
-            <Stack.Screen name="Robot Controller" component={MainScreen} />
+            <Stack.Screen name="Home" component={MainScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </RosSettingsContext.Provider>
