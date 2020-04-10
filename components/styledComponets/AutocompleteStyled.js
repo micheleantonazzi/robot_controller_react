@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import AppThemeContext from '../contexts/AppThemeContext';
-import {Autocomplete} from 'react-native-dropdown-autocomplete';
+import {Autocomplete} from 'my-react-native-dropdown-autocomplete';
 
 const AutocompleteStyled = props => {
   const theme = useContext(AppThemeContext);
@@ -17,9 +17,17 @@ const AutocompleteStyled = props => {
         borderRadius: 0,
         justifyContent: 'center',
       }}
+      scrollStyle={{
+        backgroundColor: theme.colors.background,
+        borderWidth: 1,
+        borderRadius: 0,
+        borderColor: theme.colors.secondary,
+      }}
+      listItemTextStyle={{color: 'white', fontSize: 15}}
       inputContainerStyle={{padding: 0}}
-      placeholder=""
+      placeholder={''}
       highlightTextColor={theme.colors.secondary}
+      firstLetterCapital={false}
     />
   );
 };
