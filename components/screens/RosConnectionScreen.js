@@ -92,7 +92,9 @@ const RosConnectionScreen = props => {
             noDataText={'No url found'}
             onChangeText={newText => onTextChangeHandle(newText)}
             autoCapitalize={'none'}
-            scrollStyle={{backgroundColor: 'blue'}}
+            separatorStyle={{height: 0}}
+            listFooterStyle={{height: 0, borderTopWidth: 0}}
+            pickerStyle={{width: '90%', elevation: 20}}
             renderIcon={color => (
               <Icon
                 name="link"
