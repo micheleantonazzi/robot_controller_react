@@ -18,7 +18,8 @@
     "react-native-screens": "^2.4.0",
     "react-native-safe-area-context": "^0.7.3",
     "my-react-native-dropdown-autocomplete": "micheleantonazzi/react-native-dropdown-autocomplete",
-    "react-native-vector-icons": "^6.6.0"
+    "react-native-vector-icons": "^6.6.0",
+    "react-native-simple-toast": "^1.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
