@@ -11,6 +11,8 @@ import ROSLIB from 'roslib';
 import AutocompleteStyled from '../styledComponets/AutocompleteStyled';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Strings} from '../definitions/Strings';
+import SimpleToast from 'react-native-simple-toast';
 
 const RosConnectionScreen = props => {
   const rosSettings = useContext(RosSettingsContext);
@@ -60,11 +62,24 @@ const RosConnectionScreen = props => {
       });
 
       ros.on('connection', function() {
-        console.log('Connected to websocket server.');
+        SimpleToast.show(Strings.connectionSuccess);
+        props.navigation.replace('Home');
+        rosSettings.is_first_connection = false;
+        rosSettings.ros_ip = address;
       });
 
       ros.on('error', function(error) {
-        console.log('Error connecting to websocket server: ', error);
+        if (rosSettings.is_first_connection === true) {
+          SimpleToast.show(Strings.firstConnectionError);
+        } else {
+          SimpleToast.show(Strings.connectionError);
+        }
+        if (!props.navigation.isFocused()) {
+          props.navigation.reset({
+            index: 0,
+            routes: [{name: 'Connection'}],
+          });
+        }
       });
 
       ros.on('close', function() {
