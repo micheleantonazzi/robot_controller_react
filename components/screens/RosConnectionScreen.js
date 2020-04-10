@@ -1,20 +1,32 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
+  AsyncStorage,
   Keyboard,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import TextInputStyled from '../styledComponets/TextInputStyled';
 import ButtonStyled from '../styledComponets/ButtonStyled';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
-import {add} from 'react-native-reanimated';
+import AutocompleteStyled from '../styledComponets/AutocompleteStyled';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {sleep} from 'my-react-native-dropdown-autocomplete/utils/common';
 
 const RosConnectionScreen = props => {
   const rosSettings = useContext(RosSettingsContext);
   const [rosIp, setRosIp] = useState(rosSettings.ros_ip);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [urlCollection, setUrlCollection] = useState([]);
+
+  // Runs only after the first render and it load the urlCollection
+  useEffect(() => {
+    const promise = AsyncStorage.getItem('urlCollection');
+    promise
+      .then(ret => setUrlCollection(JSON.parse(ret)))
+      .catch(e => console.log(e))
+      .done();
+  }, []);
 
   const urlValidator = address => {
     return address.match(
@@ -22,8 +34,31 @@ const RosConnectionScreen = props => {
     );
   };
 
-  const connectToRos = address => {
+  const onTextChangeHandle = newText => {
+    if (urlValidator(newText) !== null) {
+      setIsDisabled(false);
+      setRosIp(newText);
+    } else {
+      setIsDisabled(true);
+      setRosIp(newText);
+    }
+  };
+
+  const connectToRos = async address => {
     if (urlValidator(address) !== null) {
+      try {
+        if (urlCollection.includes(address) === false) {
+          setUrlCollection(urlCollection.concat([address]).slice(0, 5));
+          await AsyncStorage.setItem(
+            'urlCollection',
+            JSON.stringify(urlCollection),
+          );
+        }
+        console.log('saved');
+      } catch (e) {
+        console.log('error saving');
+      }
+
       var ros = new ROSLIB.Ros({
         url: address,
       });
@@ -41,25 +76,37 @@ const RosConnectionScreen = props => {
       });
     }
   };
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
       }}>
       <View style={styles.mainViewStyle}>
-        <TextInputStyled
-          style={styles.textInputAddressStyle}
-          value={rosIp}
-          autoCapitalize={'none'}
-          onChangeText={newText => {
-            if (urlValidator(newText) !== null) {
-              setIsDisabled(false);
-            } else {
-              setIsDisabled(true);
+        <View>
+          <AutocompleteStyled
+            fetchData={() =>
+              urlCollection.filter(value => new RegExp('^' + rosIp).test(value))
             }
-            setRosIp(newText);
-          }}
-        />
+            handleSelectItem={(item, id) => {
+              onTextChangeHandle(item);
+            }}
+            valueExtractor={(item, index) => item}
+            waitInterval={200}
+            noDataText={'No url found'}
+            onChangeText={newText => onTextChangeHandle(newText)}
+            autoCapitalize={'none'}
+            scrollStyle={{backgroundColor: 'blue'}}
+            renderIcon={color => (
+              <Icon
+                name="link"
+                size={20}
+                color={color}
+                style={{position: 'absolute', top: 11, left: 10}}
+              />
+            )}
+          />
+        </View>
         <View style={styles.buttonBoxStyle}>
           <ButtonStyled
             title={'Connect'}
