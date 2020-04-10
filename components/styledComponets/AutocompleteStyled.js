@@ -19,7 +19,7 @@ const AutocompleteStyled = props => {
       }}
       scrollStyle={{
         backgroundColor: theme.colors.background,
-        borderWidth: 1,
+        borderWidth: 0,
         borderRadius: 0,
         borderColor: theme.colors.secondary,
       }}
