@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
-  AsyncStorage,
   Keyboard,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -11,7 +10,7 @@ import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
 import AutocompleteStyled from '../styledComponets/AutocompleteStyled';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {sleep} from 'my-react-native-dropdown-autocomplete/utils/common';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const RosConnectionScreen = props => {
   const rosSettings = useContext(RosSettingsContext);
@@ -44,19 +43,16 @@ const RosConnectionScreen = props => {
     }
   };
 
-  const connectToRos = async address => {
+  const connectToRos = address => {
     if (urlValidator(address) !== null) {
-      try {
-        if (urlCollection.includes(address) === false) {
-          setUrlCollection(urlCollection.concat([address]).slice(0, 5));
-          await AsyncStorage.setItem(
-            'urlCollection',
-            JSON.stringify(urlCollection),
-          );
-        }
-        console.log('saved');
-      } catch (e) {
-        console.log('error saving');
+      if (urlCollection.includes(address) === false) {
+        setUrlCollection(urlCollection.concat([address]).slice(0, 5));
+        AsyncStorage.setItem(
+          'urlCollection',
+          JSON.stringify(urlCollection.concat([address]).slice(0, 5)),
+        )
+          .catch(e => console.log(e))
+          .done();
       }
 
       var ros = new ROSLIB.Ros({
@@ -126,7 +122,6 @@ const styles = StyleSheet.create({
   mainViewStyle: {
     flex: 1,
     padding: 30,
-    justifyContent: 'center',
   },
   textInputAddressStyle: {
     borderBottomWidth: 2,
