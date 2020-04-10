@@ -17,7 +17,7 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-screens": "^2.4.0",
     "react-native-safe-area-context": "^0.7.3",
-    "react-native-dropdown-autocomplete": "^1.0.18"
+    "my-react-native-dropdown-autocomplete": "micheleantonazzi/react-native-dropdown-autocomplete"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
