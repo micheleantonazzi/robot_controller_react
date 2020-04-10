@@ -24,10 +24,10 @@ const AutocompleteStyled = props => {
         borderColor: theme.colors.secondary,
       }}
       listItemTextStyle={{color: 'white', fontSize: 15}}
-      inputContainerStyle={{padding: 0}}
       placeholder={''}
       highlightTextColor={theme.colors.secondary}
       firstLetterCapital={false}
+      renderIcon={() => props.renderIcon(theme.colors.secondary)}
     />
   );
 };
