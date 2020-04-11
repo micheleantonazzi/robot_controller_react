@@ -13,11 +13,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Strings} from '../definitions/Strings';
 import SimpleToast from 'react-native-simple-toast';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const RosConnectionScreen = props => {
   const rosSettings = useContext(RosSettingsContext);
   const [rosIp, setRosIp] = useState(rosSettings.ros_ip);
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [isDisabledButtonConnect, setIsDisabledButtonConnect] = useState(true);
+  const [isVisibleSpinner, setIsVisibleSpinner] = useState(false);
   const [urlCollection, setUrlCollection] = useState([]);
 
   // Runs only after the first render and it load the urlCollection
@@ -37,10 +39,10 @@ const RosConnectionScreen = props => {
 
   const onTextChangeHandle = newText => {
     if (urlValidator(newText) !== null) {
-      setIsDisabled(false);
+      setIsDisabledButtonConnect(false);
       setRosIp(newText);
     } else {
-      setIsDisabled(true);
+      setIsDisabledButtonConnect(true);
       setRosIp(newText);
     }
   };
@@ -57,6 +59,9 @@ const RosConnectionScreen = props => {
           .done();
       }
 
+      setIsDisabledButtonConnect(true);
+      setIsVisibleSpinner(true);
+
       var ros = new ROSLIB.Ros({
         url: address,
       });
@@ -66,6 +71,9 @@ const RosConnectionScreen = props => {
         props.navigation.replace('Home');
         rosSettings.is_first_connection = false;
         rosSettings.ros_ip = address;
+
+        setIsDisabledButtonConnect(false);
+        setIsVisibleSpinner(false);
       });
 
       ros.on('error', function(error) {
@@ -80,10 +88,16 @@ const RosConnectionScreen = props => {
             routes: [{name: 'Connection'}],
           });
         }
+
+        setIsDisabledButtonConnect(false);
+        setIsVisibleSpinner(false);
       });
 
       ros.on('close', function() {
         console.log('Connection to websocket server closed.');
+
+        setIsDisabledButtonConnect(false);
+        setIsVisibleSpinner(false);
       });
     }
   };
@@ -95,6 +109,14 @@ const RosConnectionScreen = props => {
       }}>
       <View style={styles.mainViewStyle}>
         <View>
+          <Spinner
+            visible={isVisibleSpinner}
+            textContent={'Connecting to master...'}
+            textStyle={{color: 'white'}}
+            animation={'fade'}
+            size={'large'}
+            overlayColor={'rgba(12, 12, 12, 0.3)'}
+          />
           <AutocompleteStyled
             fetchData={() =>
               urlCollection.filter(value => new RegExp('^' + rosIp).test(value))
@@ -127,7 +149,7 @@ const RosConnectionScreen = props => {
               Keyboard.dismiss();
               connectToRos(rosIp);
             }}
-            disabled={isDisabled}
+            disabled={isDisabledButtonConnect}
           />
         </View>
       </View>
