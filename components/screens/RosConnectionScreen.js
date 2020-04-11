@@ -14,8 +14,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {Strings} from '../definitions/Strings';
 import SimpleToast from 'react-native-simple-toast';
 import Spinner from 'react-native-loading-spinner-overlay';
+import AppThemeContext from '../contexts/AppThemeContext';
 
 const RosConnectionScreen = props => {
+  const theme = useContext(AppThemeContext);
   const rosSettings = useContext(RosSettingsContext);
   const [rosIp, setRosIp] = useState(rosSettings.ros_ip);
   const [isDisabledButtonConnect, setIsDisabledButtonConnect] = useState(true);
@@ -111,11 +113,12 @@ const RosConnectionScreen = props => {
         <View>
           <Spinner
             visible={isVisibleSpinner}
-            textContent={'Connecting to master...'}
-            textStyle={{color: 'white'}}
+            textContent={'Connecting to master'}
+            textStyle={{color: theme.colors.textMedium}}
             animation={'fade'}
             size={'large'}
-            overlayColor={'rgba(12, 12, 12, 0.3)'}
+            overlayColor={'rgba(24, 24, 24, 0.4)'}
+            color={theme.colors.secondary}
           />
           <AutocompleteStyled
             fetchData={() =>
