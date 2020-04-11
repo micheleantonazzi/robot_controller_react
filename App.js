@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {StatusBar} from 'react-native';
+import {StatusBar, View, Text, Button} from 'react-native';
+import RosConnectionScreen from './components/screens/RosConnectionScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {AppThemeDark} from './components/definitions/AppThemeDark';
@@ -11,10 +12,34 @@ import RobotControlScreen from './components/screens/RobotControlScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 
 // Navigators
+const ModalStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const RobotControllerStack = createStackNavigator();
 
-const getRobotControllerStackNavigator = () => (
+// Get navigators
+function ModalScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontSize: 30 }}>This is a modal!</Text>
+      <Button onPress={() => navigation.goBack()} title="Dismiss" />
+    </View>
+  );
+}
+const getModalNavigatorWithInnerNavigator = innerNavigator => (
+  <ModalStack.Navigator mode="modal">
+    <ModalStack.Screen
+      name="Main"
+      component={innerNavigator}
+      options={{ headerShown: false }}
+    />
+    <ModalStack.Screen
+      name="RosConnectionModal"
+      component={ModalScreen}
+    />
+  </ModalStack.Navigator>
+);
+
+const getRobotControllerNavigator = () => (
   <RobotControllerStack.Navigator>
     <RobotControllerStack.Screen
       name={'RobotControllerScreen'}
@@ -36,7 +61,7 @@ const App = () => {
           <Drawer.Navigator>
             <Drawer.Screen
               name={'RobotControlScree'}
-              component={getRobotControllerStackNavigator}
+              component={() => getModalNavigatorWithInnerNavigator(getRobotControllerNavigator)}
             />
           </Drawer.Navigator>
         </NavigationContainer>
