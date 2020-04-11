@@ -1,8 +1,19 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {StatusBar, View, Text, Button} from 'react-native';
+import {
+  StatusBar,
+  View,
+  Text,
+  Button,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from 'react-native';
 import RosConnectionScreen from './components/screens/RosConnectionScreen';
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  NavigationContainer,
+  DrawerActions,
+  useNavigation,
+} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {AppThemeDark} from './components/definitions/AppThemeDark';
 import AppThemeContext from './components/contexts/AppThemeContext';
@@ -12,20 +23,27 @@ import RobotControlScreen from './components/screens/RobotControlScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Strings} from './components/definitions/Strings';
 
+const HeaderLeft = () => {
+  const navigation = useNavigation();
+  return (
+    <View style={{flexDirection: 'row'}}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.dispatch(DrawerActions.openDrawer());
+        }}>
+        <Text>Open</Text>
+        {/* <Image source={require('./assets/images/icons/drawer.png')} /> */}
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 // Navigators
 const ModalStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const RobotControllerStack = createStackNavigator();
 
 // Get navigators
-function ModalScreen({navigation}) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text style={{fontSize: 30}}>This is a modal!</Text>
-      <Button onPress={() => navigation.goBack()} title="Dismiss" />
-    </View>
-  );
-}
 const getDrawerNavigator = () => (
   <Drawer.Navigator>
     <Drawer.Screen
@@ -40,7 +58,11 @@ const getRobotControllerNavigator = () => (
     <RobotControllerStack.Screen
       name={Strings.robotControlScreen}
       component={RobotControlScreen}
-      options={{title: 'Robot Controller'}}
+      options={{
+        title: 'Robot Controller',
+
+        headerLeft: ({}) => <HeaderLeft />,
+      }}
     />
   </RobotControllerStack.Navigator>
 );
