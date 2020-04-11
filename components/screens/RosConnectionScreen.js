@@ -15,6 +15,7 @@ import {Strings} from '../definitions/Strings';
 import SimpleToast from 'react-native-simple-toast';
 import Spinner from 'react-native-loading-spinner-overlay';
 import AppThemeContext from '../contexts/AppThemeContext';
+import TextInputStyled from '../styledComponets/TextInputStyled';
 
 const RosConnectionScreen = props => {
   const theme = useContext(AppThemeContext);
@@ -68,28 +69,27 @@ const RosConnectionScreen = props => {
         url: address,
       });
 
-      ros.on('connection', function() {
+      ros.on('connection', () => {
         SimpleToast.show(Strings.connectionSuccess);
-        props.navigation.replace('Home');
-        rosSettings.is_first_connection = false;
+        props.navigation.goBack();
+        rosSettings.is_connected = true;
         rosSettings.ros_ip = address;
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
       });
 
-      ros.on('error', function(error) {
-        if (rosSettings.is_first_connection === true) {
-          SimpleToast.show(Strings.firstConnectionError);
+      ros.on('error', error => {
+        if (rosSettings.is_connected === true) {
+          SimpleToast.show(Strings.connectionClosedError);
         } else {
           SimpleToast.show(Strings.connectionError);
         }
         if (!props.navigation.isFocused()) {
-          props.navigation.reset({
-            index: 0,
-            routes: [{name: 'Connection'}],
-          });
+          props.navigation.navigate(Strings.rosConnectionScreen);
         }
+
+        rosSettings.is_connected = false;
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
@@ -105,58 +105,65 @@ const RosConnectionScreen = props => {
   };
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}>
-      <View style={styles.mainViewStyle}>
+    <View style={styles.mainViewStyle}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+        }}>
         <View>
-          <Spinner
-            visible={isVisibleSpinner}
-            textContent={'Connecting to master'}
-            textStyle={{color: theme.colors.textMedium}}
-            animation={'fade'}
-            size={'large'}
-            overlayColor={'rgba(24, 24, 24, 0.4)'}
-            color={theme.colors.secondary}
-          />
-          <AutocompleteStyled
-            fetchData={() =>
-              urlCollection.filter(value => new RegExp('^' + rosIp).test(value))
-            }
-            handleSelectItem={(item, id) => {
-              onTextChangeHandle(item);
-            }}
-            valueExtractor={(item, index) => item}
-            waitInterval={200}
-            noDataText={'No url found'}
-            onChangeText={newText => onTextChangeHandle(newText)}
-            autoCapitalize={'none'}
-            separatorStyle={{height: 0}}
-            listFooterStyle={{height: 0, borderTopWidth: 0}}
-            pickerStyle={{width: '90%', elevation: 20}}
-            renderIcon={color => (
-              <Icon
-                name="link"
-                size={20}
-                color={color}
-                style={{position: 'absolute', top: 11, left: 10}}
-              />
-            )}
-          />
+          <TextInputStyled style={styles.titleTextStyle}>
+            Connect to master
+          </TextInputStyled>
+          <View>
+            <Spinner
+              visible={isVisibleSpinner}
+              textContent={'Connecting to master'}
+              textStyle={{color: theme.colors.textMedium}}
+              animation={'fade'}
+              size={'large'}
+              overlayColor={'rgba(24, 24, 24, 0.4)'}
+              color={theme.colors.secondary}
+            />
+            <AutocompleteStyled
+              fetchData={() =>
+                urlCollection.filter(value =>
+                  new RegExp('^' + rosIp).test(value),
+                )
+              }
+              handleSelectItem={(item, id) => {
+                onTextChangeHandle(item);
+              }}
+              valueExtractor={(item, index) => item}
+              waitInterval={200}
+              noDataText={'No url found'}
+              onChangeText={newText => onTextChangeHandle(newText)}
+              autoCapitalize={'none'}
+              separatorStyle={{height: 0}}
+              listFooterStyle={{height: 0, borderTopWidth: 0}}
+              pickerStyle={{width: '90%', elevation: 20}}
+              renderIcon={color => (
+                <Icon
+                  name="link"
+                  size={20}
+                  color={color}
+                  style={{position: 'absolute', top: 11, left: 10}}
+                />
+              )}
+            />
+          </View>
+          <View style={styles.buttonBoxStyle}>
+            <ButtonStyled
+              title={'Connect'}
+              onPress={() => {
+                Keyboard.dismiss();
+                connectToRos(rosIp);
+              }}
+              disabled={isDisabledButtonConnect}
+            />
+          </View>
         </View>
-        <View style={styles.buttonBoxStyle}>
-          <ButtonStyled
-            title={'Connect'}
-            onPress={() => {
-              Keyboard.dismiss();
-              connectToRos(rosIp);
-            }}
-            disabled={isDisabledButtonConnect}
-          />
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
@@ -164,6 +171,11 @@ const styles = StyleSheet.create({
   mainViewStyle: {
     flex: 1,
     padding: 30,
+  },
+  titleTextStyle: {
+    textAlign: 'center',
+    fontSize: 30,
+    marginBottom: 15,
   },
   textInputAddressStyle: {
     borderBottomWidth: 2,
