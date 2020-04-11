@@ -10,7 +10,7 @@ const TextInputStyled = props => {
       {...props}
       style={{
         borderColor: theme.colors.border,
-        color: theme.colors.inputText,
+        color: theme.colors.text,
         ...props.style,
       }}
     />
