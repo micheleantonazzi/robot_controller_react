@@ -10,6 +10,7 @@ import RosSettingsContext from './components/contexts/RosSettingsContext';
 import {RosSettings} from './components/definitions/RosSettings';
 import RobotControlScreen from './components/screens/RobotControlScreen';
 import {createStackNavigator} from '@react-navigation/stack';
+import {Strings} from './components/definitions/Strings';
 
 // Navigators
 const ModalStack = createStackNavigator();
@@ -17,32 +18,27 @@ const Drawer = createDrawerNavigator();
 const RobotControllerStack = createStackNavigator();
 
 // Get navigators
-function ModalScreen({ navigation }) {
+function ModalScreen({navigation}) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: 30 }}>This is a modal!</Text>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text style={{fontSize: 30}}>This is a modal!</Text>
       <Button onPress={() => navigation.goBack()} title="Dismiss" />
     </View>
   );
 }
-const getModalNavigatorWithInnerNavigator = innerNavigator => (
-  <ModalStack.Navigator mode="modal">
-    <ModalStack.Screen
-      name="Main"
-      component={innerNavigator}
-      options={{ headerShown: false }}
+const getDrawerNavigator = () => (
+  <Drawer.Navigator>
+    <Drawer.Screen
+      name={'RobotControlScree'}
+      component={getRobotControllerNavigator}
     />
-    <ModalStack.Screen
-      name="RosConnectionModal"
-      component={ModalScreen}
-    />
-  </ModalStack.Navigator>
+  </Drawer.Navigator>
 );
 
 const getRobotControllerNavigator = () => (
   <RobotControllerStack.Navigator>
     <RobotControllerStack.Screen
-      name={'RobotControllerScreen'}
+      name={Strings.robotControlScreen}
       component={RobotControlScreen}
       options={{title: 'Robot Controller'}}
     />
@@ -58,12 +54,18 @@ const App = () => {
       <RosSettingsContext.Provider value={rosSettings}>
         <StatusBar backgroundColor={theme.colors.statusBar} />
         <NavigationContainer theme={theme}>
-          <Drawer.Navigator>
-            <Drawer.Screen
-              name={'RobotControlScree'}
-              component={() => getModalNavigatorWithInnerNavigator(getRobotControllerNavigator)}
+          <ModalStack.Navigator mode="modal">
+            <ModalStack.Screen
+              name="Main"
+              component={getDrawerNavigator}
+              options={{headerShown: false}}
             />
-          </Drawer.Navigator>
+            <ModalStack.Screen
+              name={Strings.rosConnectionScreen}
+              component={RosConnectionScreen}
+              options={{headerShown: false}}
+            />
+          </ModalStack.Navigator>
         </NavigationContainer>
       </RosSettingsContext.Provider>
     </AppThemeContext.Provider>
