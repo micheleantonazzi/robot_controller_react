@@ -9,7 +9,7 @@ const AutocompleteStyled = props => {
     <Autocomplete
       {...props}
       inputStyle={{
-        color: theme.colors.inputText,
+        color: theme.colors.text,
         width: '100%',
         borderWidth: 0,
         borderColor: theme.colors.secondary,
