@@ -1,12 +1,13 @@
 export const AppThemeDark = {
   colors: {
-    primary: '#45a4f4',
-    secondary: '#0eab9a',
+    primary: '#42a5f6',
+    secondary: '#00b09c',
     background: '#101d25',
     card: '#232d36',
-    text: '#8f969e',
+    text: '#ffffff',
+    textMedium: '#d5d6d8',
+    textDark: '#949c9f',
     border: '#0eab9a',
-    statusBar: '#0f1e25',
-    inputText: '#ffffff',
+    statusBar: '#232d36',
   },
 };
