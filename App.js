@@ -22,21 +22,7 @@ import {RosSettings} from './components/definitions/RosSettings';
 import RobotControlScreen from './components/screens/RobotControlScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Strings} from './components/definitions/Strings';
-
-const HeaderLeft = () => {
-  const navigation = useNavigation();
-  return (
-    <View style={{flexDirection: 'row'}}>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.dispatch(DrawerActions.openDrawer());
-        }}>
-        <Text>Open</Text>
-        {/* <Image source={require('./assets/images/icons/drawer.png')} /> */}
-      </TouchableOpacity>
-    </View>
-  );
-};
+import HeaderLeftStyled from './components/styledComponets/HeaderLeftStyled';
 
 // Navigators
 const ModalStack = createStackNavigator();
@@ -60,8 +46,7 @@ const getRobotControllerNavigator = () => (
       component={RobotControlScreen}
       options={{
         title: 'Robot Controller',
-
-        headerLeft: ({}) => <HeaderLeft />,
+        headerLeft: ({}) => <HeaderLeftStyled />,
       }}
     />
   </RobotControllerStack.Navigator>
