@@ -5,8 +5,9 @@ export const Strings = {
 
   // Screen names
   rosConnectionScreen: 'rosConnectionScreen',
-  robotControlScreen: 'rosControlScreen',
+  robotControlScreen: 'robotControlScreen',
+  stackNavigatorControlScreen: 'stackNavigationControlScreen',
 
   // Menu items
-  robotControlScreenItemName: 'Robot control',
+  robotControlScreenItemName: 'Robot localization',
 };

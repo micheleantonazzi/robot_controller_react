@@ -8,7 +8,7 @@ import {AppThemeDark} from './components/definitions/AppThemeDark';
 import AppThemeContext from './components/contexts/AppThemeContext';
 import RosSettingsContext from './components/contexts/RosSettingsContext';
 import {RosSettings} from './components/definitions/RosSettings';
-import RobotControlScreen from './components/screens/RobotControlScreen';
+import RobotLocalizationScreen from './components/screens/RobotLocalizationScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Strings} from './components/definitions/Strings';
 import HeaderLeftStyled from './components/styledComponets/HeaderLeftStyled';
@@ -23,10 +23,12 @@ const RobotControllerStack = createStackNavigator();
 const getDrawerNavigator = () => (
   <Drawer.Navigator
     drawerType={'front'}
-    drawerContent={props => <DrawerContentStyled {...props} />}>
+    drawerContent={props => <DrawerContentStyled {...props} />}
+  >
     <Drawer.Screen
-      name={Strings.robotControlScreenItemName}
+      name={Strings.stackNavigatorControlScreen}
       component={getRobotControllerNavigator}
+      options={{drawerLabel: Strings.robotControlScreenItemName}}
     />
   </Drawer.Navigator>
 );
@@ -35,9 +37,9 @@ const getRobotControllerNavigator = () => (
   <RobotControllerStack.Navigator>
     <RobotControllerStack.Screen
       name={Strings.robotControlScreen}
-      component={RobotControlScreen}
+      component={RobotLocalizationScreen}
       options={{
-        title: 'Robot Controller',
+        title: Strings.robotControlScreenItemName,
         headerLeft: ({}) => <HeaderLeftStyled />,
       }}
     />
