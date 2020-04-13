@@ -6,4 +6,7 @@ export const Strings = {
   // Screen names
   rosConnectionScreen: 'rosConnectionScreen',
   robotControlScreen: 'rosControlScreen',
+
+  // Menu items
+  robotControlScreenItemName: 'Robot control',
 };
