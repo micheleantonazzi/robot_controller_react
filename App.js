@@ -23,8 +23,7 @@ const RobotControllerStack = createStackNavigator();
 const getDrawerNavigator = () => (
   <Drawer.Navigator
     drawerType={'front'}
-    drawerContent={props => <DrawerContentStyled {...props} />}
-  >
+    drawerContent={props => <DrawerContentStyled {...props} />}>
     <Drawer.Screen
       name={Strings.stackNavigatorControlScreen}
       component={getRobotControllerNavigator}
