@@ -3,6 +3,7 @@ import {Button, Text, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
+import Canvas from 'react-native-canvas';
 
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
@@ -42,9 +43,17 @@ const RobotLocalizationScreen = props => {
   useEffect(() => {
     createMapListener();
   }, [rosSettingsContext.rosSettings.ros_connector]);
+
+  const handleCanvas = (canvas) => {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'purple';
+    ctx.fillRect(0, 0, 100, 100);
+  };
+
   return (
-    <View>
-      <Button title={'Modal'} onPress={() => {}} />
+    <View style={{flex:1}}>
+    <Canvas ref={handleCanvas}/>
+
     </View>
   );
 };
