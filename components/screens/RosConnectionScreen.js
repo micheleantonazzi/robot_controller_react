@@ -79,7 +79,7 @@ const RosConnectionScreen = props => {
         SimpleToast.show(Strings.connectionSuccess);
         props.navigation.goBack();
         rosSettings.is_connected = true;
-        rosSettings.ros_ip = address;
+        rosSettings.ros_connector = ros;
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
