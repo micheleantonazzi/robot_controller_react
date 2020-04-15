@@ -29,7 +29,13 @@ const RosConnectionScreen = props => {
   useEffect(() => {
     const promise = AsyncStorage.getItem('urlCollection');
     promise
-      .then(ret => setUrlCollection(JSON.parse(ret)))
+      .then(ret => {
+        if (ret === null) {
+          setUrlCollection([]);
+        } else {
+          setUrlCollection(JSON.parse(ret));
+        }
+      })
       .catch(e => console.log(e))
       .done();
   }, []);
