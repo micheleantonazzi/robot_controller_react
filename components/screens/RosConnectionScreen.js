@@ -19,8 +19,8 @@ import TextInputStyled from '../styledComponets/TextInputStyled';
 
 const RosConnectionScreen = props => {
   const theme = useContext(AppThemeContext);
-  const rosSettings = useContext(RosSettingsContext);
-  const [rosIp, setRosIp] = useState(rosSettings.ros_ip);
+  const rosSettingsContext = useContext(RosSettingsContext);
+  const [rosIp, setRosIp] = useState(rosSettingsContext.rosSettings.ros_ip);
   const [isDisabledButtonConnect, setIsDisabledButtonConnect] = useState(true);
   const [isVisibleSpinner, setIsVisibleSpinner] = useState(false);
   const [urlCollection, setUrlCollection] = useState([]);
@@ -76,17 +76,18 @@ const RosConnectionScreen = props => {
       });
 
       ros.on('connection', () => {
+        console.log('connected');
         SimpleToast.show(Strings.connectionSuccess);
         props.navigation.goBack();
-        rosSettings.is_connected = true;
-        rosSettings.ros_connector = ros;
+        rosSettingsContext.changeProperty('is_connected', true);
+        rosSettingsContext.changeProperty('ros_connector', ros);
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
       });
 
       ros.on('error', error => {
-        if (rosSettings.is_connected === true) {
+        if (rosSettingsContext.rosSettings.is_connected === true) {
           SimpleToast.show(Strings.connectionClosedError);
         } else {
           SimpleToast.show(Strings.connectionError);
@@ -95,7 +96,7 @@ const RosConnectionScreen = props => {
           props.navigation.navigate(Strings.rosConnectionScreen);
         }
 
-        rosSettings.is_connected = false;
+        rosSettingsContext.changeProperty('is_connected', false);
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);

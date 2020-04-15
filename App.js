@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar} from 'react-native';
 import RosConnectionScreen from './components/screens/RosConnectionScreen';
 import {NavigationContainer} from '@react-navigation/native';
@@ -7,7 +7,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {AppThemeDark} from './components/definitions/AppThemeDark';
 import AppThemeContext from './components/contexts/AppThemeContext';
 import RosSettingsContext from './components/contexts/RosSettingsContext';
-import {RosSettings} from './components/definitions/RosSettings';
+import {CreateRosSettings} from './components/definitions/CreateRosSettings';
 import RobotLocalizationScreen from './components/screens/RobotLocalizationScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Strings} from './components/definitions/Strings';
@@ -47,11 +47,22 @@ const getRobotControllerNavigator = () => (
 
 const App = () => {
   const theme = AppThemeDark;
-  const rosSettings = RosSettings;
+  const [rosSettings, setRosSettings] = useState(CreateRosSettings(null));
+  const changeRosSettingsProperty = (propertyName, propertyValue) => {
+    if (rosSettings.hasOwnProperty(propertyName)) {
+      const nwRosSettings = CreateRosSettings(rosSettings);
+      nwRosSettings[propertyName] = propertyValue;
+      setRosSettings(nwRosSettings);
+    }
+  };
 
   return (
     <AppThemeContext.Provider value={theme}>
-      <RosSettingsContext.Provider value={rosSettings}>
+      <RosSettingsContext.Provider
+        value={{
+          rosSettings: rosSettings,
+          changeProperty: changeRosSettingsProperty,
+        }}>
         <StatusBar backgroundColor={theme.colors.statusBar} />
         <NavigationContainer theme={theme}>
           <ModalStack.Navigator mode="modal">
