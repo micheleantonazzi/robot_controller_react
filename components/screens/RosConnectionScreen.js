@@ -71,7 +71,7 @@ const RosConnectionScreen = props => {
       setIsDisabledButtonConnect(true);
       setIsVisibleSpinner(true);
 
-      var ros = new ROSLIB.Ros({
+      let ros = new ROSLIB.Ros({
         url: address,
       });
 
