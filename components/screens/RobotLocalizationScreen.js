@@ -10,14 +10,43 @@ import {useHeaderHeight} from '@react-navigation/stack';
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
   const [mapListener, setMapListener] = useState(null);
+  const [poseListener, setPoseListener] = useState(null);
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
+  const [robotPose, setRobotPose] = useState(null);
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
 
+  // Returns the up view height in order to center the canvas
+  const getViewUpHeight = () => {
+    const screenHeight = Dimensions.get('window').height;
+    const screenWidth = Dimensions.get('window').width;
+
+    if (screenHeight <= screenWidth) {
+      return screenHeight;
+    }
+
+    return (screenHeight - headerHeight - screenWidth) / 2;
+  };
+
+  // Get the canvas dimensions based on the screen size
+  const getCanvasDimensions = () => {
+    const screenWidth =
+      Dimensions.get('screen').width * Dimensions.get('screen').scale;
+    const screenHeight =
+      Dimensions.get('screen').height * Dimensions.get('screen').scale;
+
+    // Canvas must be a square
+    const canvasDimension =
+      screenWidth > screenHeight
+        ? Math.floor(screenHeight)
+        : Math.floor(screenWidth);
+
+    return canvasDimension;
+  };
+
   // Create new map Listener
   const createMapListener = () => {
-    console.log('createMapListener');
     if (rosSettingsContext.rosSettings.ros_connector !== null) {
       if (mapListener !== null) {
         mapListener.unsubscribe();
@@ -37,20 +66,24 @@ const RobotLocalizationScreen = props => {
     }
   };
 
-  // Get the canvas dimensions based on the screen size
-  const getCanvasDimensions = () => {
-    const screenWidth =
-      Dimensions.get('screen').width * Dimensions.get('screen').scale;
-    const screenHeight =
-      Dimensions.get('screen').height * Dimensions.get('screen').scale;
+  const createPoseListener = () => {
+    if (rosSettingsContext.rosSettings.ros_connector !== null) {
+      if (poseListener !== null) {
+        poseListener.unsubscribe();
+      }
 
-    // Canvas must be a square
-    const canvasDimension =
-      screenWidth > screenHeight
-        ? Math.floor(screenHeight)
-        : Math.floor(screenWidth);
+      const newPoseListener = new ROSLIB.Topic({
+        ros: rosSettingsContext.rosSettings.ros_connector,
+        name: '/amcl_pose',
+        messageType: 'geometry_msgs/PoseWithCovarianceStamped',
+      });
 
-    return canvasDimension;
+      newPoseListener.subscribe(function(message) {
+        setRobotPose(message);
+      });
+
+      setPoseListener(newPoseListener);
+    }
   };
 
   // At first render, check if it is connected otherwise open RosConnectionScreen
@@ -63,11 +96,12 @@ const RobotLocalizationScreen = props => {
   // Create a new mapListener only if the ros_connector changes
   useEffect(() => {
     createMapListener();
+    createPoseListener();
+    console.log("'change connector");
   }, [rosSettingsContext.rosSettings.ros_connector]);
 
   // Generate the map image if the map message changes
   useEffect(() => {
-
     if (mapMessage !== null) {
       canvasRef.current.width = mapMessage.info.width;
       canvasRef.current.height = mapMessage.info.height;
@@ -106,7 +140,7 @@ const RobotLocalizationScreen = props => {
     }
   }, [mapMessage]);
 
-  // Re-render canvas when the map image and position changes
+  // Re-render map when the map image and position changes
   useEffect(() => {
     if (mapImageSource !== null) {
       const canvasDimension = getCanvasDimensions();
@@ -117,22 +151,40 @@ const RobotLocalizationScreen = props => {
       context.clearRect(0, 0, canvasDimension, canvasDimension);
       const mapImage = new CanvasImage(canvasRef.current);
       mapImage.addEventListener('load', () => {
+        const scale = canvasDimension / mapImageSource.width;
+        context.scale(scale, scale);
         context.imageSmoothingEnabled = false;
-        context.drawImage(mapImage, 0, 0, canvasDimension, canvasDimension);
+        context.drawImage(
+          mapImage,
+          0,
+          0,
+          mapImageSource.width,
+          mapImageSource.height,
+        );
+        drawRobotPoseMarker();
       });
       mapImage.src = mapImageSource.data;
+      context.clearRect(0, 0, canvasDimension, canvasDimension);
     }
   }, [mapImageSource]);
 
-  const getViewUpHeight = () => {
-    const screenHeight = Dimensions.get('window').height;
-    const screenWidth = Dimensions.get('window').width;
-
-    if (screenHeight <= screenWidth) {
-      return screenHeight;
+  // Re-render position marker when the robot position changes or map change
+  useEffect(() => {
+    if (robotPose !== null) {
+      drawRobotPoseMarker();
     }
+  }, [robotPose]);
 
-    return (screenHeight - headerHeight - screenWidth) / 2;
+  const drawRobotPoseMarker = () => {
+    console.log(robotPose.pose.pose.position);
+    const context = canvasRef.current.getContext('2d');
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.beginPath();
+    context.moveTo(75, 50);
+    context.lineTo(100, 75);
+    context.lineTo(100, 25);
+    context.closePath();
+    context.fill();
   };
 
   return (
