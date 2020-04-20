@@ -71,6 +71,11 @@ const RosConnectionScreen = props => {
       setIsDisabledButtonConnect(true);
       setIsVisibleSpinner(true);
 
+      // Disconnect old varable if exists
+      if (rosSettingsContext.rosSettings.ros_connector !== null) {
+        rosSettingsContext.rosSettings.ros_connector.close();
+      }
+
       let ros = new ROSLIB.Ros({
         url: address,
       });
