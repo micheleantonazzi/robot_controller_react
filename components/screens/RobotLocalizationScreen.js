@@ -59,6 +59,7 @@ const RobotLocalizationScreen = props => {
       });
 
       newMapListener.subscribe(function(message) {
+        console.log(message.info);
         setMapMessage(message);
       });
 
@@ -88,7 +89,7 @@ const RobotLocalizationScreen = props => {
 
   // At first render, check if it is connected otherwise open RosConnectionScreen
   useEffect(() => {
-    if (!rosSettingsContext.rosSettings.is_connected) {
+    if (rosSettingsContext.rosSettings.is_connected === false) {
       props.navigation.navigate(Strings.rosConnectionScreen);
     }
   }, []);
@@ -97,7 +98,6 @@ const RobotLocalizationScreen = props => {
   useEffect(() => {
     createMapListener();
     createPoseListener();
-    console.log("'change connector");
   }, [rosSettingsContext.rosSettings.ros_connector]);
 
   // Generate the map image if the map message changes
@@ -109,6 +109,7 @@ const RobotLocalizationScreen = props => {
       context.clearRect(0, 0, mapMessage.info.width, mapMessage.info.height);
       const imageSize = mapMessage.info.width * mapMessage.info.height;
       const imageDataArray = new Array(imageSize * 4);
+      /*
       for (let i = 0; i < imageSize; ++i) {
         const occupancyGridValue = mapMessage.data[i];
         const pixelLuminance =
@@ -121,6 +122,26 @@ const RobotLocalizationScreen = props => {
         imageDataArray[i * 4 + 3] = 255;
       }
 
+       */
+
+      for (let i = 0; i < mapMessage.info.height; ++i) {
+        for(let y = 0; y < mapMessage.info.width; ++y){
+          const occupancyGridValue =
+            mapMessage.data[i * mapMessage.info.width + y];
+          const pixelLuminance =
+            occupancyGridValue < 0
+              ? 205
+              : (255 * (100 - occupancyGridValue)) / 100;
+
+          const pixelCoordinate =
+            i * mapMessage.info.width * 4 + (mapMessage.info.width - 1 - y) * 4;
+          imageDataArray[pixelCoordinate] = pixelLuminance;
+          imageDataArray[pixelCoordinate + 1] = pixelLuminance;
+          imageDataArray[pixelCoordinate + 2] = pixelLuminance;
+          imageDataArray[pixelCoordinate + 3] = 255;
+        }
+      }
+
       const imageData = new ImageData(
         canvasRef.current,
         imageDataArray,
@@ -128,19 +149,28 @@ const RobotLocalizationScreen = props => {
         mapMessage.info.height,
       );
 
+      console.log('draw first');
       context.putImageData(imageData, 0, 0);
       canvasRef.current.toDataURL('image/png').then(res => {
-        setMapImageSource({
-          data: res.substring(1, res.length - 1),
-          width: mapMessage.info.width,
-          height: mapMessage.info.height,
+        // Create map image to render in the canvas
+        const mapImage = new CanvasImage(canvasRef.current);
+        mapImage.addEventListener('load', () => {
+          console.log('reset mapsource');
+          setMapImageSource({
+            image: mapImage,
+            width: mapMessage.info.width,
+            height: mapMessage.info.height,
+          });
         });
+        mapImage.src = res.substring(1, res.length - 1);
       });
       context.clearRect(0, 0, mapMessage.info.width, mapMessage.info.height);
+      canvasRef.current.width = getCanvasDimensions();
+      canvasRef.current.height = getCanvasDimensions();
     }
   }, [mapMessage]);
 
-  // Re-render map when the map image and position changes
+  // Re-render map when the map image changes
   useEffect(() => {
     if (mapImageSource !== null) {
       const canvasDimension = getCanvasDimensions();
@@ -148,43 +178,46 @@ const RobotLocalizationScreen = props => {
       canvasRef.current.height = canvasDimension;
 
       const context = canvasRef.current.getContext('2d');
-      context.clearRect(0, 0, canvasDimension, canvasDimension);
-      const mapImage = new CanvasImage(canvasRef.current);
-      mapImage.addEventListener('load', () => {
-        const scale = canvasDimension / mapImageSource.width;
-        context.scale(scale, scale);
-        context.imageSmoothingEnabled = false;
-        context.drawImage(
-          mapImage,
-          0,
-          0,
-          mapImageSource.width,
-          mapImageSource.height,
-        );
-        drawRobotPoseMarker();
-      });
-      mapImage.src = mapImageSource.data;
-      context.clearRect(0, 0, canvasDimension, canvasDimension);
-    }
-  }, [mapImageSource]);
-
-  // Re-render position marker when the robot position changes or map change
-  useEffect(() => {
-    if (robotPose !== null) {
+      const scale = canvasDimension / mapImageSource.width;
+      context.imageSmoothingEnabled = false;
+      context.scale(scale, scale);
+      context.drawImage(
+        mapImageSource.image,
+        0,
+        0,
+        mapImageSource.width,
+        mapImageSource.height,
+      );
       drawRobotPoseMarker();
     }
-  }, [robotPose]);
+  }, [mapImageSource, robotPose]);
 
   const drawRobotPoseMarker = () => {
-    console.log(robotPose.pose.pose.position);
-    const context = canvasRef.current.getContext('2d');
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.beginPath();
-    context.moveTo(75, 50);
-    context.lineTo(100, 75);
-    context.lineTo(100, 25);
-    context.closePath();
-    context.fill();
+    if (mapMessage !== null && robotPose !== null) {
+      const context = canvasRef.current.getContext('2d');
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      const translateY =
+        (robotPose.pose.pose.position.y - mapMessage.info.origin.position.y) /
+        mapMessage.info.resolution;
+      const translateX =
+        (robotPose.pose.pose.position.x - mapMessage.info.origin.position.x) /
+        mapMessage.info.resolution;
+
+      context.translate(
+        getCanvasDimensions() -
+          translateX * (getCanvasDimensions() / mapMessage.info.width),
+        translateY * (getCanvasDimensions() / mapMessage.info.width),
+      );
+      context.beginPath();
+
+      context.moveTo(0, -37);
+      context.lineTo(25, +37);
+      context.lineTo(0, 20);
+      context.lineTo(-25, +37);
+      context.lineTo(0, -37);
+      context.closePath();
+      context.fill();
+    }
   };
 
   return (
