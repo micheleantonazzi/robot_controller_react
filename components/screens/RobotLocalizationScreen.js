@@ -13,7 +13,7 @@ const RobotLocalizationScreen = props => {
   const [poseListener, setPoseListener] = useState(null);
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
-  const [robotPose, setRobotPose] = useState(null);
+  //const [robotPose, setRobotPose] = useState(null);
   const [screenDimension, setScreenDimension] = useState(Dimensions.get('screen'));
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
@@ -96,7 +96,7 @@ const RobotLocalizationScreen = props => {
       });
 
       newPoseListener.subscribe(function(message) {
-        setRobotPose(message);
+        drawRobotPoseMarker(message);
       });
 
       setPoseListener(newPoseListener);
@@ -186,6 +186,11 @@ const RobotLocalizationScreen = props => {
 
   // Re-render map when the map image changes
   useEffect(() => {
+    drawImageMap();
+    createPoseListener();
+  }, [screenDimension, mapImageSource]);
+
+  const drawImageMap = () => {
     const canvasDimension = getCanvasDimensions();
     canvasRef.current.width = canvasDimension;
     canvasRef.current.height = canvasDimension;
@@ -202,7 +207,7 @@ const RobotLocalizationScreen = props => {
         mapImageSource.width,
         mapImageSource.height,
       );
-      drawRobotPoseMarker();
+      drawRobotPoseMarker(null);
     } else {
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -210,12 +215,14 @@ const RobotLocalizationScreen = props => {
       context.fillStyle = 'white';
       context.strokeStyle = 'red';
       context.textAlign = 'center';
-      context.fillText('NO MAP DATA', 540, 540);
+      context.fillText('NO MAP DATA', getCanvasDimensions() / 2, getCanvasDimensions() / 2);
     }
-  }, [screenDimension, mapImageSource, robotPose]);
-
-  const drawRobotPoseMarker = () => {
+  };
+  const drawRobotPoseMarker = (robotPose) => {
+    console.log('try to draw pose');
     if (mapMessage !== null && robotPose !== null) {
+      console.log('draw pose');
+      drawImageMap();
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
       const translateY =
@@ -258,6 +265,8 @@ const RobotLocalizationScreen = props => {
       context.fill();
     }
   };
+
+  useEffect(() => {console.log('re-render')})
 
   return (
     <View style={{flex: 1, flexDirection: screenDimension.height >= screenDimension.width ? 'column' : 'row'}}>
