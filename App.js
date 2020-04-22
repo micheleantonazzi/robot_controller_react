@@ -13,29 +13,37 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Strings} from './components/definitions/Strings';
 import HeaderLeftStyled from './components/styledComponets/HeaderLeftStyled';
 import DrawerContentStyled from './components/styledComponets/DrawerContentStyled';
+import StreamingCameraScreen from './components/screens/StreamingCameraScreen';
 
 // Navigators
 const ModalStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const RobotControllerStack = createStackNavigator();
+const StreamingCameraStack = createStackNavigator();
 
-// Get navigators
+// Get drawer navigator
 const getDrawerNavigator = () => (
   <Drawer.Navigator
     drawerType={'front'}
     drawerContent={props => <DrawerContentStyled {...props} />}>
     <Drawer.Screen
-      name={Strings.stackNavigatorControlScreen}
+      name={Strings.stackNavigatorControlScreenName}
       component={getRobotControllerNavigator}
       options={{drawerLabel: Strings.robotControlScreenItemName}}
+    />
+    <Drawer.Screen
+      name={Strings.stackNavigatorStreamingCameraScreenName}
+      component={getStreamingCameraNavigator}
+      options={{drawerLabel: Strings.streamingCameraScreenItemName}}
     />
   </Drawer.Navigator>
 );
 
+// Get navigator related to RobotControllerScreen
 const getRobotControllerNavigator = () => (
   <RobotControllerStack.Navigator>
     <RobotControllerStack.Screen
-      name={Strings.robotControlScreen}
+      name={Strings.robotControlScreenName}
       component={RobotLocalizationScreen}
       options={{
         title: Strings.robotControlScreenItemName,
@@ -43,6 +51,20 @@ const getRobotControllerNavigator = () => (
       }}
     />
   </RobotControllerStack.Navigator>
+);
+
+// Get navigator related to StreamingCameraScreen
+const getStreamingCameraNavigator = () => (
+  <StreamingCameraStack.Navigator>
+    <StreamingCameraStack.Screen
+      name={Strings.streamingCameraScreenName}
+      component={StreamingCameraScreen}
+      options={{
+        title: Strings.streamingCameraScreenItemName,
+        headerLeft: ({}) => <HeaderLeftStyled />,
+      }}
+    />
+  </StreamingCameraStack.Navigator>
 );
 
 const App = () => {
@@ -72,7 +94,7 @@ const App = () => {
               options={{headerShown: false}}
             />
             <ModalStack.Screen
-              name={Strings.rosConnectionScreen}
+              name={Strings.rosConnectionScreenName}
               component={RosConnectionScreen}
               options={{headerShown: false}}
             />
