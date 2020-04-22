@@ -98,7 +98,7 @@ const RosConnectionScreen = props => {
           SimpleToast.show(Strings.connectionError);
         }
         if (!props.navigation.isFocused()) {
-          props.navigation.navigate(Strings.rosConnectionScreen);
+          props.navigation.navigate(Strings.rosConnectionScreenName);
         }
 
         rosSettingsContext.changeProperty('is_connected', false);

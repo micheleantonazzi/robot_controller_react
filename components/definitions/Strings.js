@@ -4,9 +4,9 @@ export const Strings = {
   connectionSuccess: 'Connect with master!',
 
   // Screen names
-  rosConnectionScreen: 'rosConnectionScreen',
-  robotControlScreen: 'robotControlScreen',
-  stackNavigatorControlScreen: 'stackNavigationControlScreen',
+  rosConnectionScreenName: 'rosConnectionScreen',
+  robotControlScreenName: 'robotControlScreen',
+  stackNavigatorControlScreenName: 'stackNavigationControlScreen',
 
   // Menu items
   robotControlScreenItemName: 'Robot localization',

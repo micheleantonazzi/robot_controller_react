@@ -106,7 +106,7 @@ const RobotLocalizationScreen = props => {
   // At first render, check if it is connected otherwise open RosConnectionScreen
   useEffect(() => {
     if (rosSettingsContext.rosSettings.is_connected === false) {
-      props.navigation.navigate(Strings.rosConnectionScreen);
+      props.navigation.navigate(Strings.rosConnectionScreenName);
     }
   }, []);
 
