@@ -14,8 +14,13 @@ const RobotLocalizationScreen = props => {
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
   const [robotPose, setRobotPose] = useState(null);
+  const [screenDimension, setScreenDimension] = useState(Dimensions.get('window'));
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
+
+  Dimensions.addEventListener('change', () => {
+    setScreenDimension(Dimensions.get('window'));
+  });
 
   // Returns the up view height in order to center the canvas
   const getViewUpHeight = () => {
@@ -32,14 +37,14 @@ const RobotLocalizationScreen = props => {
   // Get the canvas dimensions based on the screen size
   const getCanvasDimensions = () => {
     const screenWidth =
-      Dimensions.get('screen').width * Dimensions.get('screen').scale;
+      screenDimension.width * screenDimension.scale;
     const screenHeight =
-      Dimensions.get('screen').height * Dimensions.get('screen').scale;
+      screenDimension.height * screenDimension.scale;
 
     // Canvas must be a square
     const canvasDimension =
       screenWidth > screenHeight
-        ? Math.floor(screenHeight)
+        ? Math.floor(screenHeight) - headerHeight * screenDimension.scale
         : Math.floor(screenWidth);
 
     return canvasDimension;
@@ -124,7 +129,7 @@ const RobotLocalizationScreen = props => {
        */
 
       for (let i = 0; i < mapMessage.info.height; ++i) {
-        for (let y = 0; y < mapMessage.info.width; ++y){
+        for (let y = 0; y < mapMessage.info.width; ++y) {
           const occupancyGridValue =
             mapMessage.data[i * mapMessage.info.width + y];
           const pixelLuminance =
@@ -196,7 +201,7 @@ const RobotLocalizationScreen = props => {
       context.textAlign = 'center';
       context.fillText('NO MAP DATA', 540, 540);
     }
-  }, [mapImageSource, robotPose]);
+  }, [screenDimension, mapImageSource, robotPose]);
 
   const drawRobotPoseMarker = () => {
     if (mapMessage !== null && robotPose !== null) {
