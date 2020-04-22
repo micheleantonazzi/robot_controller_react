@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import 'react-native-get-random-values';
-import {Dimensions, View} from 'react-native';
+import {Button, Dimensions, Text, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
@@ -23,7 +23,7 @@ const RobotLocalizationScreen = props => {
     const screenWidth = Dimensions.get('window').width;
 
     if (screenHeight <= screenWidth) {
-      return screenHeight;
+      return 0;
     }
 
     return (screenHeight - headerHeight - screenWidth) / 2;
@@ -125,7 +125,7 @@ const RobotLocalizationScreen = props => {
        */
 
       for (let i = 0; i < mapMessage.info.height; ++i) {
-        for(let y = 0; y < mapMessage.info.width; ++y){
+        for (let y = 0; y < mapMessage.info.width; ++y){
           const occupancyGridValue =
             mapMessage.data[i * mapMessage.info.width + y];
           const pixelLuminance =
@@ -155,7 +155,6 @@ const RobotLocalizationScreen = props => {
         // Create map image to render in the canvas
         const mapImage = new CanvasImage(canvasRef.current);
         mapImage.addEventListener('load', () => {
-          console.log('reset mapsource');
           setMapImageSource({
             image: mapImage,
             width: mapMessage.info.width,
@@ -172,10 +171,10 @@ const RobotLocalizationScreen = props => {
 
   // Re-render map when the map image changes
   useEffect(() => {
+    const canvasDimension = getCanvasDimensions();
+    canvasRef.current.width = canvasDimension;
+    canvasRef.current.height = canvasDimension;
     if (mapImageSource !== null) {
-      const canvasDimension = getCanvasDimensions();
-      canvasRef.current.width = canvasDimension;
-      canvasRef.current.height = canvasDimension;
 
       const context = canvasRef.current.getContext('2d');
       const scale = canvasDimension / mapImageSource.width;
@@ -189,6 +188,16 @@ const RobotLocalizationScreen = props => {
         mapImageSource.height,
       );
       drawRobotPoseMarker();
+    } else {
+      console.log('scrivo');
+      const context = canvasRef.current.getContext('2d');
+      context.setTransform(1, 0, 0, 1, 0, 0);
+
+      context.font = '100px Comic Sans MS';
+      context.fillStyle = 'white';
+      context.strokeStyle = 'red';
+      context.textAlign = 'center';
+      context.fillText('NO MAP DATA', 540, 540);
     }
   }, [mapImageSource, robotPose]);
 
