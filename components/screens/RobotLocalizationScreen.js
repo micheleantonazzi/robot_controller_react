@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState, useCallback} from 'react';
 import 'react-native-get-random-values';
 import {Dimensions, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
@@ -6,6 +6,7 @@ import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
 import Canvas, {ImageData, Image as CanvasImage} from 'react-native-canvas';
 import {useHeaderHeight} from '@react-navigation/stack';
+import {useFocusEffect} from '@react-navigation/native';
 
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
@@ -13,7 +14,6 @@ const RobotLocalizationScreen = props => {
   const [poseListener, setPoseListener] = useState(null);
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
-  //const [robotPose, setRobotPose] = useState(null);
   const [screenDimension, setScreenDimension] = useState(Dimensions.get('screen'));
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
@@ -48,10 +48,8 @@ const RobotLocalizationScreen = props => {
 
   // Get the canvas dimensions based on the screen size
   const getCanvasDimensions = () => {
-    const screenWidth =
-      screenDimension.width * screenDimension.scale;
-    const screenHeight =
-      screenDimension.height * screenDimension.scale;
+    const screenWidth = screenDimension.width * screenDimension.scale;
+    const screenHeight = screenDimension.height * screenDimension.scale;
 
     // Canvas must be a square
     const canvasDimension =
@@ -111,10 +109,32 @@ const RobotLocalizationScreen = props => {
   }, []);
 
   // Create a new mapListener only if the ros_connector changes
+
   useEffect(() => {
     createMapListener();
     createPoseListener();
   }, [rosSettingsContext.rosSettings.ros_connector]);
+
+  // subscribe the existing listeners on focus and unsubscribe when screen changes
+  useFocusEffect(
+    useCallback(() => {
+      if (mapListener !== null) {
+        mapListener.subscribe(function(message) {
+          setMapMessage(message);
+        });
+      }
+      if (poseListener !== null) {
+        poseListener.subscribe(function(message) {
+          drawRobotPoseMarker(message);
+        });
+      }
+      return () => {
+        if (poseListener !== null){
+          poseListener.unsubscribe();
+        }
+      };
+    }),
+  );
 
   // Generate the map image if the map message changes
   useEffect(() => {
@@ -215,13 +235,15 @@ const RobotLocalizationScreen = props => {
       context.fillStyle = 'white';
       context.strokeStyle = 'red';
       context.textAlign = 'center';
-      context.fillText('NO MAP DATA', getCanvasDimensions() / 2, getCanvasDimensions() / 2);
+      context.fillText(
+        'NO MAP DATA',
+        getCanvasDimensions() / 2,
+        getCanvasDimensions() / 2,
+      );
     }
   };
-  const drawRobotPoseMarker = (robotPose) => {
-    console.log('try to draw pose');
+  const drawRobotPoseMarker = robotPose => {
     if (mapMessage !== null && robotPose !== null) {
-      console.log('draw pose');
       drawImageMap();
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -266,10 +288,13 @@ const RobotLocalizationScreen = props => {
     }
   };
 
-  useEffect(() => {console.log('re-render')})
-
   return (
-    <View style={{flex: 1, flexDirection: screenDimension.height >= screenDimension.width ? 'column' : 'row'}}>
+    <View
+      style={{
+        flex: 1,
+        flexDirection:
+          screenDimension.height >= screenDimension.width ? 'column' : 'row',
+      }}>
       <View style={{height: getViewUpHeight(), width: getViewUpWidth()}} />
       <Canvas ref={canvasRef} />
     </View>
