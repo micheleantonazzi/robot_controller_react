@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import 'react-native-get-random-values';
-import {Button, Dimensions, Text, View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import ROSLIB from 'roslib';
@@ -59,7 +59,6 @@ const RobotLocalizationScreen = props => {
       });
 
       newMapListener.subscribe(function(message) {
-        console.log(message.info);
         setMapMessage(message);
       });
 
@@ -189,10 +188,8 @@ const RobotLocalizationScreen = props => {
       );
       drawRobotPoseMarker();
     } else {
-      console.log('scrivo');
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
-
       context.font = '100px Comic Sans MS';
       context.fillStyle = 'white';
       context.strokeStyle = 'red';
@@ -212,11 +209,29 @@ const RobotLocalizationScreen = props => {
         (robotPose.pose.pose.position.x - mapMessage.info.origin.position.x) /
         mapMessage.info.resolution;
 
+      // Translate
       context.translate(
         getCanvasDimensions() -
           translateX * (getCanvasDimensions() / mapMessage.info.width),
         translateY * (getCanvasDimensions() / mapMessage.info.width),
       );
+
+      // Scale to adjust the marker to the map dimensions
+      context.scale(
+        384.0 / mapMessage.info.width / 1.5,
+        384.0 / mapMessage.info.width / 1.5,
+      );
+
+      // Rotate
+      const orientation = robotPose.pose.pose.orientation;
+      const siny_cosp =
+        2 * (orientation.w * orientation.z + orientation.x * orientation.y);
+      const cosy_cosp =
+        1 - 2 * (orientation.y * orientation.y + orientation.z * orientation.z);
+      const theta = Math.atan2(siny_cosp, cosy_cosp);
+      const rotation = (theta * 180.0) / Math.PI;
+      console.log(theta);
+      context.rotate(-theta - (Math.PI / 2));
       context.beginPath();
 
       context.moveTo(0, -37);
