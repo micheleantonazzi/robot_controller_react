@@ -14,24 +14,36 @@ const RobotLocalizationScreen = props => {
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
   const [robotPose, setRobotPose] = useState(null);
-  const [screenDimension, setScreenDimension] = useState(Dimensions.get('window'));
+  const [screenDimension, setScreenDimension] = useState(Dimensions.get('screen'));
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
 
   Dimensions.addEventListener('change', () => {
-    setScreenDimension(Dimensions.get('window'));
+    setScreenDimension(Dimensions.get('screen'));
   });
 
   // Returns the up view height in order to center the canvas
   const getViewUpHeight = () => {
-    const screenHeight = Dimensions.get('window').height;
-    const screenWidth = Dimensions.get('window').width;
+    const screenHeight = screenDimension.height;
+    const screenWidth = screenDimension.width;
 
     if (screenHeight <= screenWidth) {
       return 0;
     }
 
-    return (screenHeight - headerHeight - screenWidth) / 2;
+    return (screenHeight - headerHeight * 1.4 - screenWidth) / 2.0;
+  };
+
+  // Returns the up view height in order to center the canvas
+  const getViewUpWidth = () => {
+    const screenHeight = screenDimension.height;
+    const screenWidth = screenDimension.width;
+
+    if (screenHeight >= screenWidth) {
+      return 0;
+    }
+
+    return (screenWidth - screenHeight + headerHeight * 0.4) / 2;
   };
 
   // Get the canvas dimensions based on the screen size
@@ -153,7 +165,6 @@ const RobotLocalizationScreen = props => {
         mapMessage.info.height,
       );
 
-      console.log('draw first');
       context.putImageData(imageData, 0, 0);
       canvasRef.current.toDataURL('image/png').then(res => {
         // Create map image to render in the canvas
@@ -235,7 +246,6 @@ const RobotLocalizationScreen = props => {
         1 - 2 * (orientation.y * orientation.y + orientation.z * orientation.z);
       const theta = Math.atan2(siny_cosp, cosy_cosp);
       const rotation = (theta * 180.0) / Math.PI;
-      console.log(theta);
       context.rotate(-theta - (Math.PI / 2));
       context.beginPath();
 
@@ -250,8 +260,8 @@ const RobotLocalizationScreen = props => {
   };
 
   return (
-    <View style={{flex: 1}}>
-      <View style={{height: getViewUpHeight()}} />
+    <View style={{flex: 1, flexDirection: screenDimension.height >= screenDimension.width ? 'column' : 'row'}}>
+      <View style={{height: getViewUpHeight(), width: getViewUpWidth()}} />
       <Canvas ref={canvasRef} />
     </View>
   );
