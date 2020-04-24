@@ -18,7 +18,7 @@ const StreamingCameraScreen = props => {
   );
   const [webViewUri, setWebViewUri] = useState(createUri());
   const [displayWebView, setDisplayWebView] = useState(true);
-
+  const [k, setK] = useState(0);
   const calculateWebViewDimension = showWebView => {
     console.log('calculate webview dim ' + showWebView);
     if (showWebView === false) {
@@ -39,19 +39,16 @@ const StreamingCameraScreen = props => {
     calculateWebViewDimension(displayWebView);
   });
 
+  // On screen focus reload webview
   useEffect(() => {
     props.navigation.addListener('focus', () => {
-      calculateWebViewDimension(false);
-      SimpleToast.show('Reload camera stream');
-      setWebViewUri({
-        html: '<body style="background-color: black"></body>',
-      });
-
-      setTimeout(() => {
-        setWebViewUri(createUri());
-      }, 1000);
+      incrementK();
     });
   }, [props.navigation]);
+
+  const incrementK = () => {
+    setK(k + 1);
+  };
 
   return (
     <View
@@ -62,6 +59,8 @@ const StreamingCameraScreen = props => {
         backgroundColor: 'black',
       }}>
       <WebView
+        // The page which share cam finishes loading only if it fails, otherwise it doesn't terminate
+        key={k}
         ref={webViewRef}
         style={{
           width: webViewDimension.width,
@@ -71,8 +70,14 @@ const StreamingCameraScreen = props => {
         scrollEnabled={false}
         cacheEnabled={false}
         onError={() => calculateWebViewDimension(false)}
-        onLoad={() => {
-          calculateWebViewDimension(true);
+
+        onLoadStart={(e) => {
+          if (e.nativeEvent.loading === true) {
+            calculateWebViewDimension(true);
+          }
+        }}
+        onLoadEnd={(e) => {
+          calculateWebViewDimension(false);
         }}
       />
       <View
@@ -86,15 +91,7 @@ const StreamingCameraScreen = props => {
         }}>
         <TouchableOpacity
           onPress={() => {
-            calculateWebViewDimension(false);
-            SimpleToast.show('Reload camera stream');
-            setWebViewUri({
-              html: '<body style="background-color: black"></body>',
-            });
-
-            setTimeout(() => {
-              setWebViewUri(createUri());
-            }, 10);
+            incrementK();
           }}
           activeOpacity={0.7}>
           <FontAwesomeIcon icon={faRedo} size={25} color={'white'} />
