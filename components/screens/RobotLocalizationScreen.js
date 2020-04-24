@@ -7,14 +7,18 @@ import ROSLIB from 'roslib';
 import Canvas, {ImageData, Image as CanvasImage} from 'react-native-canvas';
 import {useHeaderHeight} from '@react-navigation/stack';
 import {useFocusEffect} from '@react-navigation/native';
+import AppThemeContext from '../contexts/AppThemeContext';
 
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
+  const themeContext = useContext(AppThemeContext);
   const [mapListener, setMapListener] = useState(null);
   const [poseListener, setPoseListener] = useState(null);
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
-  const [screenDimension, setScreenDimension] = useState(Dimensions.get('screen'));
+  const [screenDimension, setScreenDimension] = useState(
+    Dimensions.get('screen'),
+  );
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
 
@@ -232,7 +236,7 @@ const RobotLocalizationScreen = props => {
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
       context.font = '100px Comic Sans MS';
-      context.fillStyle = 'white';
+      context.fillStyle = themeContext.colors.text;
       context.strokeStyle = 'red';
       context.textAlign = 'center';
       context.fillText(
