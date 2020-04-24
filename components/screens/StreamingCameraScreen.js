@@ -1,12 +1,13 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState, useEffect, useContext} from 'react';
 import {View, Dimensions, Text, TouchableOpacity} from 'react-native';
 import WebView from 'react-native-webview';
-import {useFocusEffect} from '@react-navigation/native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faRedo} from '@fortawesome/free-solid-svg-icons';
 import SimpleToast from 'react-native-simple-toast';
+import AppThemeContext from '../contexts/AppThemeContext';
 
 const StreamingCameraScreen = props => {
+  const themeContext = useContext(AppThemeContext);
   const webViewRef = useRef();
 
   // Create the uri for the web view
@@ -17,10 +18,8 @@ const StreamingCameraScreen = props => {
     Dimensions.get('window'),
   );
   const [webViewUri, setWebViewUri] = useState(createUri());
-  const [displayWebView, setDisplayWebView] = useState(true);
   const [k, setK] = useState(0);
   const calculateWebViewDimension = showWebView => {
-    console.log('calculate webview dim ' + showWebView);
     if (showWebView === false) {
       setWebViewDimension({width: 0, height: 0});
     } else {
@@ -36,7 +35,7 @@ const StreamingCameraScreen = props => {
   };
 
   Dimensions.addEventListener('change', () => {
-    calculateWebViewDimension(displayWebView);
+    calculateWebViewDimension(webViewDimension.width > 0 ? true : false);
   });
 
   // On screen focus reload webview
@@ -76,25 +75,45 @@ const StreamingCameraScreen = props => {
             calculateWebViewDimension(true);
           }
         }}
-        onLoadEnd={(e) => {
+        onLoadEnd={e => {
           calculateWebViewDimension(false);
         }}
       />
+      {webViewDimension.width <= 0 ?
+        <Text
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            right: 0,
+            color: themeContext.colors.text,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            fontSize: 38,
+            backgroundColor: 'black',
+          }}>
+          NO VIDEO DATA
+        </Text>
+        :
+        <Text style={{position: 'absolute', zIndex: -1}} />
+      }
       <View
         style={{
           position: 'absolute',
           right: 20,
           bottom: 20,
-          backgroundColor: '#42a5f6',
+          backgroundColor: themeContext.colors.primary,
           padding: 12,
           borderRadius: 50,
         }}>
         <TouchableOpacity
           onPress={() => {
+            SimpleToast.show('Reconnect to camera server');
             incrementK();
           }}
           activeOpacity={0.7}>
-          <FontAwesomeIcon icon={faRedo} size={25} color={'white'} />
+          <FontAwesomeIcon icon={faRedo} size={25} color={themeContext.colors.text} />
         </TouchableOpacity>
       </View>
     </View>
