@@ -1,4 +1,10 @@
-import React, {useContext, useEffect, useRef, useState, useCallback} from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import 'react-native-get-random-values';
 import {Dimensions, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
