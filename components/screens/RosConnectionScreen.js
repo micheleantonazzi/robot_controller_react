@@ -84,8 +84,10 @@ const RosConnectionScreen = props => {
         console.log('connected');
         SimpleToast.show(Strings.connectionSuccess);
         props.navigation.goBack();
-        rosSettingsContext.changeProperty('is_connected', true);
-        rosSettingsContext.changeProperty('ros_connector', ros);
+        rosSettingsContext.changeProperty([
+          {name: 'is_connected', value: true},
+          {name: 'ros_connector', value: ros},
+        ]);
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
@@ -101,7 +103,9 @@ const RosConnectionScreen = props => {
           props.navigation.navigate(Strings.rosConnectionScreenName);
         }
 
-        rosSettingsContext.changeProperty('is_connected', false);
+        rosSettingsContext.changeProperty([
+          {name: 'is_connected', value: false},
+        ]);
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
