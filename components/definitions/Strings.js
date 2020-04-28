@@ -4,15 +4,18 @@ export const Strings = {
   connectionSuccess: 'Connect with master!',
 
   // Navigator names
-  stackNavigatorControlScreenName: 'stackNavigationControlScreen',
+  stackNavigatorLocalizationScreenName: 'stackNavigationLocalizationScreen',
   stackNavigatorStreamingCameraScreenName: 'stackNavigatorStreamingCamera',
+  stackNavigatorRobotControlScreenName: 'stackNavigationRobotControl',
 
   // Screen names
   rosConnectionScreenName: 'rosConnectionScreen',
-  robotControlScreenName: 'robotControlScreen',
+  robotLocalizationScreenName: 'robotVisualizationScreen',
   streamingCameraScreenName: 'streamingCameraScreen',
+  robotControlScreenName: 'robotControlScreen',
 
   // Menu items
-  robotControlScreenItemName: 'Robot localization',
+  robotLocalizationScreenItemName: 'Robot localization',
   streamingCameraScreenItemName: 'Streaming camera',
+  robotControlScreenItemName: 'Robot Control',
 };

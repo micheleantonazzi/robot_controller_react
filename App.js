@@ -14,6 +14,7 @@ import {Strings} from './components/definitions/Strings';
 import HeaderLeftStyled from './components/styledComponets/HeaderLeftStyled';
 import DrawerContentStyled from './components/styledComponets/DrawerContentStyled';
 import StreamingCameraScreen from './components/screens/StreamingCameraScreen';
+import RobotControlScreen from "./components/screens/RobotControlScreen";
 
 // Navigators
 const ModalStack = createStackNavigator();
@@ -27,26 +28,31 @@ const getDrawerNavigator = () => (
     drawerType={'front'}
     drawerContent={props => <DrawerContentStyled {...props} />}>
     <Drawer.Screen
-      name={Strings.stackNavigatorControlScreenName}
-      component={getRobotControllerNavigator}
-      options={{drawerLabel: Strings.robotControlScreenItemName}}
+      name={Strings.stackNavigatorLocalizationScreenName}
+      component={getRobotLocalizationNavigator}
+      options={{drawerLabel: Strings.robotLocalizationScreenItemName}}
     />
     <Drawer.Screen
       name={Strings.stackNavigatorStreamingCameraScreenName}
       component={getStreamingCameraNavigator}
       options={{drawerLabel: Strings.streamingCameraScreenItemName}}
     />
+    <Drawer.Screen
+      name={Strings.stackNavigatorRobotControlScreenName}
+      component={getRobotControlNavigator}
+      options={{drawerLabel: Strings.robotControlScreenItemName}}
+    />
   </Drawer.Navigator>
 );
 
 // Get navigator related to RobotControllerScreen
-const getRobotControllerNavigator = () => (
+const getRobotLocalizationNavigator = () => (
   <RobotControllerStack.Navigator>
     <RobotControllerStack.Screen
-      name={Strings.robotControlScreenName}
+      name={Strings.robotLocalizationScreenName}
       component={RobotLocalizationScreen}
       options={{
-        title: Strings.robotControlScreenItemName,
+        title: Strings.robotLocalizationScreenItemName,
         headerLeft: ({}) => <HeaderLeftStyled />,
       }}
     />
@@ -61,6 +67,20 @@ const getStreamingCameraNavigator = () => (
       component={StreamingCameraScreen}
       options={{
         title: Strings.streamingCameraScreenItemName,
+        headerLeft: ({}) => <HeaderLeftStyled />,
+      }}
+    />
+  </StreamingCameraStack.Navigator>
+);
+
+// Get navigator related to StreamingCameraScreen
+const getRobotControlNavigator = () => (
+  <StreamingCameraStack.Navigator>
+    <StreamingCameraStack.Screen
+      name={Strings.robotControlScreenName}
+      component={RobotControlScreen}
+      options={{
+        title: Strings.robotControlScreenItemName,
         headerLeft: ({}) => <HeaderLeftStyled />,
       }}
     />
