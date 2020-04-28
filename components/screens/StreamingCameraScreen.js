@@ -5,20 +5,24 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faRedo} from '@fortawesome/free-solid-svg-icons';
 import SimpleToast from 'react-native-simple-toast';
 import AppThemeContext from '../contexts/AppThemeContext';
+import {useIsFocused} from '@react-navigation/native';
+
 
 const StreamingCameraScreen = props => {
   const themeContext = useContext(AppThemeContext);
   const webViewRef = useRef();
+  const isFocused = useIsFocused();
 
   // Create the uri for the web view
   const createUri = () => {
-    return {uri: 'http://192.168.1.81:8089/stream?topic=/usb_cam/image_raw'};
+    return isFocused ? {uri: 'http://192.168.1.81:8089/stream?topic=/usb_cam/image_raw'} : {uri: ''};
   };
   const [webViewDimension, setWebViewDimension] = useState(
     Dimensions.get('window'),
   );
-  const [webViewUri, setWebViewUri] = useState(createUri());
+
   const [k, setK] = useState(0);
+
   const calculateWebViewDimension = showWebView => {
     if (showWebView === false) {
       setWebViewDimension({width: 0, height: 0});
@@ -65,7 +69,7 @@ const StreamingCameraScreen = props => {
           width: webViewDimension.width,
           height: webViewDimension.height,
         }}
-        source={webViewUri}
+        source={createUri()}
         scrollEnabled={false}
         cacheEnabled={false}
         onError={() => calculateWebViewDimension(false)}
