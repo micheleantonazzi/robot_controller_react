@@ -90,12 +90,16 @@ const getRobotControlNavigator = () => (
 const App = () => {
   const theme = AppThemeDark;
   const [rosSettings, setRosSettings] = useState(CreateRosSettings(null));
-  const changeRosSettingsProperty = (propertyName, propertyValue) => {
-    if (rosSettings.hasOwnProperty(propertyName)) {
-      const nwRosSettings = CreateRosSettings(rosSettings);
-      nwRosSettings[propertyName] = propertyValue;
-      setRosSettings(nwRosSettings);
-    }
+
+  const changeRosSettingsProperties = propertiesAndValues => {
+    const newRosSettings = CreateRosSettings(rosSettings);
+    propertiesAndValues.forEach(element => {
+      const {name, value} = element;
+      if (rosSettings.hasOwnProperty(name)) {
+        newRosSettings[name] = value;
+      }
+    });
+    setRosSettings(newRosSettings);
   };
 
   return (
@@ -103,7 +107,7 @@ const App = () => {
       <RosSettingsContext.Provider
         value={{
           rosSettings: rosSettings,
-          changeProperty: changeRosSettingsProperty,
+          changeProperty: changeRosSettingsProperties,
         }}>
         <StatusBar backgroundColor={theme.colors.statusBar} />
         <NavigationContainer theme={theme}>
