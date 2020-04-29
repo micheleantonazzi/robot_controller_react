@@ -132,7 +132,7 @@ const StreamingCameraScreen = props => {
             ? {
                 position: 'absolute',
                 right: 20,
-                top: 20,
+                top: 24,
                 backgroundColor: themeContext.colors.primary,
                 padding: 12,
                 borderRadius: 50,
