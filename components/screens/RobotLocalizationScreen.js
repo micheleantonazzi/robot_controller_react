@@ -28,10 +28,6 @@ const RobotLocalizationScreen = props => {
   const canvasRef = useRef(null);
   const headerHeight = useHeaderHeight();
 
-  Dimensions.addEventListener('change', () => {
-    setScreenDimension(Dimensions.get('screen'));
-  });
-
   // Returns the up view height in order to center the canvas
   const getViewUpHeight = () => {
     const screenHeight = screenDimension.height;
@@ -91,6 +87,9 @@ const RobotLocalizationScreen = props => {
 
   // At first render, check if it is connected otherwise open RosConnectionScreen
   useEffect(() => {
+    Dimensions.addEventListener('change', () => {
+      setScreenDimension(Dimensions.get('screen'));
+    });
     if (rosSettingsContext.rosSettings.is_connected === false) {
       props.navigation.navigate(Strings.rosConnectionScreenName);
     }
