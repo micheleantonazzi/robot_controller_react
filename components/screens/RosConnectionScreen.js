@@ -84,9 +84,26 @@ const RosConnectionScreen = props => {
         console.log('connected');
         SimpleToast.show(Strings.connectionSuccess);
         props.navigation.goBack();
+
+        // Create map listener
+        const newMapListener = new ROSLIB.Topic({
+          ros: ros,
+          name: '/map',
+          messageType: 'nav_msgs/OccupancyGrid',
+        });
+
+        // Create pose listener
+        const newPoseListener = new ROSLIB.Topic({
+          ros: ros,
+          name: '/amcl_pose',
+          messageType: 'geometry_msgs/PoseWithCovarianceStamped',
+        });
+
         rosSettingsContext.changeProperty([
           {name: 'is_connected', value: true},
           {name: 'ros_connector', value: ros},
+          {name: 'map_listener', value: newMapListener},
+          {name: 'pose_listener', value: newPoseListener},
         ]);
 
         setIsDisabledButtonConnect(false);
@@ -94,6 +111,14 @@ const RosConnectionScreen = props => {
       });
 
       ros.on('error', error => {
+        if (rosSettingsContext.rosSettings.map_listener !== null) {
+          rosSettingsContext.rosSettings.map_listener.unsubscribe();
+        }
+
+        if (rosSettingsContext.rosSettings.pose_listener !== null) {
+          rosSettingsContext.rosSettings.pose_listener.unsubscribe();
+        }
+
         if (rosSettingsContext.rosSettings.is_connected === true) {
           SimpleToast.show(Strings.connectionClosedError);
         } else {

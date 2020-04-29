@@ -1,14 +1,19 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, Switch, Text} from 'react-native';
 import RobotLocalizationScreen from "./RobotLocalizationScreen";
 import StreamingCameraScreen from "./StreamingCameraScreen";
+import RosSettingsContext from "../contexts/RosSettingsContext";
 
 const RobotControlScreen = props => {
   const [switchViewIsEnable, setSwitchViewEnable] = useState(false);
-
+  const rosSettingsContext = useContext(RosSettingsContext);
+  useEffect(() => {
+    console.log(rosSettingsContext.rosSettings.is_connected);
+  })
   return (
     <View style={styles.mainViewStyle}>
-      <View style={{position: 'absolute', top:20, left: 0, right: 0, zIndex: 1, }}>
+      <View
+        style={{position: 'absolute', top: 20, left: 0, right: 0, zIndex: 1}}>
         <Switch
           onValueChange={() => setSwitchViewEnable(!switchViewIsEnable)}
           value={switchViewIsEnable}
@@ -19,7 +24,7 @@ const RobotControlScreen = props => {
         {switchViewIsEnable ? (
           <StreamingCameraScreen {...props} />
         ) : (
-          <Text>ss</Text>
+          <RobotLocalizationScreen {...props} />
         )}
       </View>
     </View>

@@ -18,8 +18,8 @@ import AppThemeContext from '../contexts/AppThemeContext';
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
   const themeContext = useContext(AppThemeContext);
-  const [mapListener, setMapListener] = useState(null);
-  const [poseListener, setPoseListener] = useState(null);
+  //const [mapListener, setMapListener] = useState(null);
+  //const [poseListener, setPoseListener] = useState(null);
   const [mapMessage, setMapMessage] = useState(null);
   const [mapImageSource, setMapImageSource] = useState(null);
   const [screenDimension, setScreenDimension] = useState(
@@ -73,41 +73,19 @@ const RobotLocalizationScreen = props => {
   // Create new map Listener
   const createMapListener = () => {
     if (rosSettingsContext.rosSettings.ros_connector !== null) {
-      if (mapListener !== null) {
-        mapListener.unsubscribe();
-      }
-
-      const newMapListener = new ROSLIB.Topic({
-        ros: rosSettingsContext.rosSettings.ros_connector,
-        name: '/map',
-        messageType: 'nav_msgs/OccupancyGrid',
-      });
-
-      newMapListener.subscribe(function(message) {
+      rosSettingsContext.rosSettings.map_listener.unsubscribe();
+      rosSettingsContext.rosSettings.map_listener.subscribe(function(message) {
         setMapMessage(message);
       });
-
-      setMapListener(newMapListener);
     }
   };
 
   const createPoseListener = () => {
     if (rosSettingsContext.rosSettings.ros_connector !== null) {
-      if (poseListener !== null) {
-        poseListener.unsubscribe();
-      }
-
-      const newPoseListener = new ROSLIB.Topic({
-        ros: rosSettingsContext.rosSettings.ros_connector,
-        name: '/amcl_pose',
-        messageType: 'geometry_msgs/PoseWithCovarianceStamped',
-      });
-
-      newPoseListener.subscribe(function(message) {
+      rosSettingsContext.rosSettings.pose_listener.unsubscribe();
+      rosSettingsContext.rosSettings.pose_listener.subscribe(function(message) {
         drawRobotPoseMarker(message);
       });
-
-      setPoseListener(newPoseListener);
     }
   };
 
@@ -119,32 +97,10 @@ const RobotLocalizationScreen = props => {
   }, []);
 
   // Create a new mapListener only if the ros_connector changes
-
   useEffect(() => {
     createMapListener();
     createPoseListener();
   }, [rosSettingsContext.rosSettings.ros_connector]);
-
-  // subscribe the existing listeners on focus and unsubscribe when screen changes
-  useFocusEffect(
-    useCallback(() => {
-      if (mapListener !== null) {
-        mapListener.subscribe(function(message) {
-          setMapMessage(message);
-        });
-      }
-      if (poseListener !== null) {
-        poseListener.subscribe(function(message) {
-          drawRobotPoseMarker(message);
-        });
-      }
-      return () => {
-        if (poseListener !== null){
-          poseListener.unsubscribe();
-        }
-      };
-    }),
-  );
 
   // Generate the map image if the map message changes
   useEffect(() => {
@@ -284,8 +240,7 @@ const RobotLocalizationScreen = props => {
       const cosy_cosp =
         1 - 2 * (orientation.y * orientation.y + orientation.z * orientation.z);
       const theta = Math.atan2(siny_cosp, cosy_cosp);
-      const rotation = (theta * 180.0) / Math.PI;
-      context.rotate(-theta - (Math.PI / 2));
+      context.rotate(-theta - Math.PI / 2);
       context.beginPath();
 
       context.moveTo(0, -37);
