@@ -8,6 +8,11 @@ import AppThemeContext from '../contexts/AppThemeContext';
 import {useIsFocused} from '@react-navigation/native';
 
 const StreamingCameraScreen = props => {
+  const getScreenOrientation = () => {
+    return Dimensions.get('screen').width >= Dimensions.get('screen').height
+      ? 'landscape'
+      : 'portrait';
+  };
   const themeContext = useContext(AppThemeContext);
   const webViewRef = useRef();
   const isFocused = useIsFocused();
@@ -20,6 +25,10 @@ const StreamingCameraScreen = props => {
   };
   const [webViewDimension, setWebViewDimension] = useState(
     Dimensions.get('window'),
+  );
+
+  const [screenOrientation, setScreenOrientation] = useState(
+    getScreenOrientation(),
   );
 
   const [k, setK] = useState(0);
@@ -39,9 +48,15 @@ const StreamingCameraScreen = props => {
     }
   };
 
-  Dimensions.addEventListener('change', () => {
-    calculateWebViewDimension(webViewDimension.width > 0);
-  });
+  useEffect(() => {
+    Dimensions.addEventListener('change', () => {
+      calculateWebViewDimension(webViewDimension.width > 0);
+    });
+    Dimensions.addEventListener('change', () => {
+      setScreenOrientation(getScreenOrientation());
+    });
+  }, []);
+
 
   // On screen focus reload webview
   useEffect(() => {
@@ -103,14 +118,34 @@ const StreamingCameraScreen = props => {
         <Text style={{position: 'absolute', zIndex: -1}} />
       )}
       <View
-        style={{
-          position: 'absolute',
-          right: 20,
-          bottom: 20,
-          backgroundColor: themeContext.colors.primary,
-          padding: 12,
-          borderRadius: 50,
-        }}>
+        style={
+          !props.isControlScreen
+            ? {
+                position: 'absolute',
+                right: 20,
+                bottom: 20,
+                backgroundColor: themeContext.colors.primary,
+                padding: 12,
+                borderRadius: 50,
+              }
+            : screenOrientation === 'portrait'
+            ? {
+                position: 'absolute',
+                right: 20,
+                top: 20,
+                backgroundColor: themeContext.colors.primary,
+                padding: 12,
+                borderRadius: 50,
+              }
+            : {
+                position: 'absolute',
+                left: 20,
+                top: 20,
+                backgroundColor: themeContext.colors.primary,
+                padding: 12,
+                borderRadius: 50,
+              }
+        }>
         <TouchableOpacity
           onPress={() => {
             SimpleToast.show('Reconnect to camera server');

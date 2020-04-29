@@ -50,7 +50,7 @@ const RobotControlScreen = props => {
         {switchViewIsEnable ? (
           <RobotLocalizationScreen {...props} />
         ) : (
-          <StreamingCameraScreen {...props} />
+          <StreamingCameraScreen {...props} isControlScreen={true} />
         )}
       </View>
     </View>
