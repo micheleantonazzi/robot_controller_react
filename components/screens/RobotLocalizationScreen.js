@@ -104,7 +104,7 @@ const RobotLocalizationScreen = props => {
 
   // Generate the map image if the map message changes
   useEffect(() => {
-    if (mapMessage !== null) {
+    if (mapMessage !== null && canvasRef.current !== null) {
       canvasRef.current.width = mapMessage.info.width;
       canvasRef.current.height = mapMessage.info.height;
       const context = canvasRef.current.getContext('2d');
@@ -177,11 +177,11 @@ const RobotLocalizationScreen = props => {
   }, [screenDimension, mapImageSource]);
 
   const drawImageMap = () => {
-    const canvasDimension = getCanvasDimensions();
-    canvasRef.current.width = canvasDimension;
-    canvasRef.current.height = canvasDimension;
-    if (mapImageSource !== null) {
 
+    if (mapImageSource !== null && canvasRef.current !== null) {
+      const canvasDimension = getCanvasDimensions();
+      canvasRef.current.width = canvasDimension;
+      canvasRef.current.height = canvasDimension;
       const context = canvasRef.current.getContext('2d');
       const scale = canvasDimension / mapImageSource.width;
       context.imageSmoothingEnabled = false;
@@ -209,7 +209,11 @@ const RobotLocalizationScreen = props => {
     }
   };
   const drawRobotPoseMarker = robotPose => {
-    if (mapMessage !== null && robotPose !== null) {
+    if (
+      mapMessage !== null &&
+      robotPose !== null &&
+      canvasRef.current !== null
+    ) {
       drawImageMap();
       const context = canvasRef.current.getContext('2d');
       context.setTransform(1, 0, 0, 1, 0, 0);
