@@ -71,7 +71,7 @@ const RosConnectionScreen = props => {
       setIsDisabledButtonConnect(true);
       setIsVisibleSpinner(true);
 
-      // Disconnect old varable if exists
+      // Disconnect old variable if exists
       if (rosSettingsContext.rosSettings.ros_connector !== null) {
         rosSettingsContext.rosSettings.ros_connector.close();
       }
