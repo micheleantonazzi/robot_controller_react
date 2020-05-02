@@ -99,11 +99,19 @@ const RosConnectionScreen = props => {
           messageType: 'geometry_msgs/PoseWithCovarianceStamped',
         });
 
+        // Create camera info listener
+        const newCameraInfoListener = new ROSLIB.Topic({
+          ros: ros,
+          name: '/usb_cam/camera_info',
+          messageType: 'sensor_msgs/CameraInfo',
+        });
+
         rosSettingsContext.changeProperty([
           {name: 'is_connected', value: true},
           {name: 'ros_connector', value: ros},
           {name: 'map_listener', value: newMapListener},
           {name: 'pose_listener', value: newPoseListener},
+          {name: 'camera_info_listener', value: newCameraInfoListener},
         ]);
 
         setIsDisabledButtonConnect(false);
@@ -117,6 +125,10 @@ const RosConnectionScreen = props => {
 
         if (rosSettingsContext.rosSettings.pose_listener !== null) {
           rosSettingsContext.rosSettings.pose_listener.unsubscribe();
+        }
+
+        if (rosSettingsContext.rosSettings.camera_info_listener !== null) {
+          rosSettingsContext.rosSettings.camera_info_listener.unsubscribe();
         }
 
         if (rosSettingsContext.rosSettings.is_connected === true) {

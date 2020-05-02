@@ -6,15 +6,16 @@ import {faRedo} from '@fortawesome/free-solid-svg-icons';
 import SimpleToast from 'react-native-simple-toast';
 import AppThemeContext from '../contexts/AppThemeContext';
 import {useIsFocused} from '@react-navigation/native';
+import RosSettingsContext from '../contexts/RosSettingsContext';
 
 const StreamingCameraScreen = props => {
   const theme = useContext(AppThemeContext);
+  const rosSettingsContext = useContext(RosSettingsContext);
   const getScreenOrientation = () => {
     return Dimensions.get('screen').width >= Dimensions.get('screen').height
       ? 'landscape'
       : 'portrait';
   };
-  const themeContext = useContext(AppThemeContext);
   const webViewRef = useRef();
   const isFocused = useIsFocused();
 
@@ -27,6 +28,8 @@ const StreamingCameraScreen = props => {
   const [webViewDimension, setWebViewDimension] = useState(
     Dimensions.get('window'),
   );
+
+  const [cameraDimension, setCameraDimension] = useState({width: 1, height: 1});
 
   const [screenOrientation, setScreenOrientation] = useState(
     getScreenOrientation(),
@@ -42,17 +45,27 @@ const StreamingCameraScreen = props => {
       const screenHeight = Dimensions.get('screen').height;
 
       if (screenHeight >= screenWidth) {
-        setWebViewDimension({width: screenWidth, height: screenWidth - 100});
+        setWebViewDimension({
+          width: screenWidth,
+          height:
+            screenWidth * (cameraDimension.height / cameraDimension.width),
+        });
       } else {
-        setWebViewDimension({width: screenHeight + 20, height: screenHeight});
+        setWebViewDimension({
+          width:
+            screenHeight + 20,
+          height: screenHeight,
+        });
       }
     }
   };
 
+  const onScreenDimensionChange = () => {
+    calculateWebViewDimension(webViewDimension.width > 0);
+  };
+
   useEffect(() => {
-    Dimensions.addEventListener('change', () => {
-      calculateWebViewDimension(webViewDimension.width > 0);
-    });
+    Dimensions.addEventListener('change', onScreenDimensionChange);
     Dimensions.addEventListener('change', () => {
       setScreenOrientation(getScreenOrientation());
     });
@@ -64,6 +77,28 @@ const StreamingCameraScreen = props => {
       incrementK();
     });
   }, [props.navigation]);
+
+  // Read camera dimension when new listener is created
+  useEffect(() => {
+    if (rosSettingsContext.rosSettings.camera_info_listener !== null) {
+      rosSettingsContext.rosSettings.camera_info_listener.subscribe(function(
+        message,
+      ) {
+        console.log(message);
+        setCameraDimension({
+          width: message.width,
+          height: message.height,
+        });
+        rosSettingsContext.rosSettings.camera_info_listener.unsubscribe();
+        Dimensions.removeEventListener('change', onScreenDimensionChange);
+      });
+    }
+  }, [rosSettingsContext.rosSettings.camera_info_listener]);
+
+  useEffect(() => {
+    calculateWebViewDimension(true);
+    Dimensions.addEventListener('change', onScreenDimensionChange);
+  }, [cameraDimension]);
 
   const incrementK = () => {
     setK(k + 1);
@@ -82,6 +117,7 @@ const StreamingCameraScreen = props => {
         key={k}
         ref={webViewRef}
         style={{
+          height: webViewDimension.height,
           maxHeight: webViewDimension.height,
           backgroundColor: theme.colors.background,
         }}
@@ -111,7 +147,7 @@ const StreamingCameraScreen = props => {
             top: 0,
             bottom: 0,
             right: 0,
-            color: themeContext.colors.text,
+            color: theme.colors.text,
             textAlign: 'center',
             textAlignVertical: 'center',
             fontSize: 38,
@@ -129,7 +165,7 @@ const StreamingCameraScreen = props => {
                 position: 'absolute',
                 right: 20,
                 bottom: 20,
-                backgroundColor: themeContext.colors.primary,
+                backgroundColor: theme.colors.primary,
                 padding: 12,
                 borderRadius: 50,
               }
@@ -138,7 +174,7 @@ const StreamingCameraScreen = props => {
                 position: 'absolute',
                 right: 20,
                 top: 24,
-                backgroundColor: themeContext.colors.primary,
+                backgroundColor: theme.colors.primary,
                 padding: 12,
                 borderRadius: 50,
               }
@@ -146,7 +182,7 @@ const StreamingCameraScreen = props => {
                 position: 'absolute',
                 left: 20,
                 top: 20,
-                backgroundColor: themeContext.colors.primary,
+                backgroundColor: theme.colors.primary,
                 padding: 12,
                 borderRadius: 50,
               }
@@ -157,11 +193,7 @@ const StreamingCameraScreen = props => {
             incrementK();
           }}
           activeOpacity={0.7}>
-          <FontAwesomeIcon
-            icon={faRedo}
-            size={25}
-            color={themeContext.colors.text}
-          />
+          <FontAwesomeIcon icon={faRedo} size={25} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
     </View>
