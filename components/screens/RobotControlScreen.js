@@ -13,6 +13,7 @@ const RobotControlScreen = props => {
   };
   const theme = useContext(AppThemeContext);
   const [switchViewIsEnable, setSwitchViewEnable] = useState(false);
+  const [switchGyroscopeIsEnable, setSwitchGyroscopeEnable] = useState(false);
   const [screenOrientation, setScreenOrientation] = useState(
     getScreenOrientation(),
   );
@@ -46,6 +47,29 @@ const RobotControlScreen = props => {
           style={styles.switchMapCameraStyle}
         />
       </View>
+      <View
+        style={
+          screenOrientation === 'portrait'
+            ? styles.switchGyroscopeViewPortraitStyle
+            : styles.switchGyroscopeViewLandscapeStyle
+        }>
+        {!switchGyroscopeIsEnable ? (
+          <Text style={{color: theme.colors.text}}>Gyroscope OFF</Text>
+        ) : (
+          <Text style={{color: theme.colors.text}}>Gyroscope ON</Text>
+        )}
+        <Switch
+          onValueChange={() =>
+            setSwitchGyroscopeEnable(!switchGyroscopeIsEnable)
+          }
+          value={switchGyroscopeIsEnable}
+          trackColor={{
+            false: 'rgba(255, 255, 255, 0.4)',
+            true: theme.colors.secondary,
+          }}
+          style={styles.switchMapCameraStyle}
+        />
+      </View>
       <View style={{flex: 4}}>
         {switchViewIsEnable ? (
           <RobotLocalizationScreen {...props} />
@@ -59,7 +83,7 @@ const RobotControlScreen = props => {
           bottom: 0,
           left: 0,
           height: 175,
-          width: 175,
+          width: 150,
         }}>
         <RNGamePad
           options={{
@@ -71,24 +95,28 @@ const RobotControlScreen = props => {
           backgroundColor={theme.colors.background}
         />
       </View>
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          height: 175,
-          width: 175,
-        }}>
-        <RNGamePad
-          options={{
-            size: 100,
-            color: 'red',
-            lockX: true,
-          }}
-          joystickType={'single-joystick'}
-          backgroundColor={theme.colors.background}
-        />
-      </View>
+      {!switchGyroscopeIsEnable ? (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            height: 175,
+            width: 150,
+          }}>
+          <RNGamePad
+            options={{
+              size: 100,
+              color: 'red',
+              lockX: true,
+            }}
+            joystickType={'single-joystick'}
+            backgroundColor={theme.colors.background}
+          />
+        </View>
+      ) : (
+        <View></View>
+      )}
     </View>
   );
 };
@@ -108,6 +136,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
+    zIndex: 1,
+    alignItems: 'center',
+  },
+  switchGyroscopeViewPortraitStyle: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    zIndex: 1,
+    alignItems: 'center',
+  },
+  switchGyroscopeViewLandscapeStyle: {
+    position: 'absolute',
+    bottom: 160,
+    left: 20,
     zIndex: 1,
     alignItems: 'center',
   },
