@@ -83,7 +83,6 @@ const RosConnectionScreen = props => {
       ros.on('connection', () => {
         console.log('connected');
         SimpleToast.show(Strings.connectionSuccess);
-        props.navigation.goBack();
 
         // Create map listener
         const newMapListener = new ROSLIB.Topic({
@@ -106,16 +105,25 @@ const RosConnectionScreen = props => {
           messageType: 'sensor_msgs/CameraInfo',
         });
 
+        // Create cmd_vel publisher
+        const newCmdVelPublisher = new ROSLIB.Topic({
+          ros: ros,
+          name: '/cmd_vel',
+          messageType: 'geometry_msgs/Twist',
+        });
+
         rosSettingsContext.changeProperty([
           {name: 'is_connected', value: true},
           {name: 'ros_connector', value: ros},
           {name: 'map_listener', value: newMapListener},
           {name: 'pose_listener', value: newPoseListener},
           {name: 'camera_info_listener', value: newCameraInfoListener},
+          {name: 'cmd_vel_publisher', value: newCmdVelPublisher},
         ]);
 
         setIsDisabledButtonConnect(false);
         setIsVisibleSpinner(false);
+        props.navigation.goBack();
       });
 
       ros.on('error', error => {
