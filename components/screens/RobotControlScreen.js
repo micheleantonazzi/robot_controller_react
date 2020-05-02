@@ -2,8 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, Switch, Text, Dimensions} from 'react-native';
 import RobotLocalizationScreen from './RobotLocalizationScreen';
 import StreamingCameraScreen from './StreamingCameraScreen';
-import RosSettingsContext from '../contexts/RosSettingsContext';
 import AppThemeContext from '../contexts/AppThemeContext';
+import RNGamePad from 'react-native-game-pad';
 
 const RobotControlScreen = props => {
   const getScreenOrientation = () => {
@@ -46,12 +46,48 @@ const RobotControlScreen = props => {
           style={styles.switchMapCameraStyle}
         />
       </View>
-      <View style={{flex: 1}}>
+      <View style={{flex: 4}}>
         {switchViewIsEnable ? (
           <RobotLocalizationScreen {...props} />
         ) : (
           <StreamingCameraScreen {...props} isControlScreen={true} />
         )}
+      </View>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          height: 175,
+          width: 175,
+        }}>
+        <RNGamePad
+          options={{
+            size: 100,
+            color: 'red',
+            lockY: true,
+          }}
+          joystickType={'single-joystick'}
+          backgroundColor={theme.colors.background}
+        />
+      </View>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          height: 175,
+          width: 175,
+        }}>
+        <RNGamePad
+          options={{
+            size: 100,
+            color: 'red',
+            lockX: true,
+          }}
+          joystickType={'single-joystick'}
+          backgroundColor={theme.colors.background}
+        />
       </View>
     </View>
   );
@@ -64,8 +100,7 @@ const styles = StyleSheet.create({
   switchMapCameraViewCenterStyle: {
     position: 'absolute',
     top: 20,
-    left: 0,
-    right: 0,
+    alignSelf: 'center',
     zIndex: 1,
     alignItems: 'center',
   },
