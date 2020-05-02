@@ -8,6 +8,7 @@ import AppThemeContext from '../contexts/AppThemeContext';
 import {useIsFocused} from '@react-navigation/native';
 
 const StreamingCameraScreen = props => {
+  const theme = useContext(AppThemeContext);
   const getScreenOrientation = () => {
     return Dimensions.get('screen').width >= Dimensions.get('screen').height
       ? 'landscape'
@@ -41,7 +42,7 @@ const StreamingCameraScreen = props => {
       const screenHeight = Dimensions.get('screen').height;
 
       if (screenHeight >= screenWidth) {
-        setWebViewDimension({width: screenWidth, height: screenHeight});
+        setWebViewDimension({width: screenWidth, height: screenWidth - 100});
       } else {
         setWebViewDimension({width: screenHeight + 20, height: screenHeight});
       }
@@ -56,7 +57,6 @@ const StreamingCameraScreen = props => {
       setScreenOrientation(getScreenOrientation());
     });
   }, []);
-
 
   // On screen focus reload webview
   useEffect(() => {
@@ -75,15 +75,20 @@ const StreamingCameraScreen = props => {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'black',
+        backgroundColor: theme.colors.background,
       }}>
       <WebView
         // The page which share cam finishes loading only if it fails, otherwise it doesn't terminate
         key={k}
         ref={webViewRef}
         style={{
+          maxHeight: webViewDimension.height,
+          backgroundColor: theme.colors.background,
+        }}
+        containerStyle={{
           width: webViewDimension.width,
-          height: webViewDimension.height,
+          maxHeight: webViewDimension.height,
+          backgroundColor: theme.colors.background,
         }}
         source={createUri()}
         scrollEnabled={false}
@@ -110,7 +115,7 @@ const StreamingCameraScreen = props => {
             textAlign: 'center',
             textAlignVertical: 'center',
             fontSize: 38,
-            backgroundColor: 'black',
+            backgroundColor: theme.colors.background,
           }}>
           NO VIDEO DATA
         </Text>
