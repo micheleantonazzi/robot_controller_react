@@ -4,14 +4,18 @@ import RobotLocalizationScreen from './RobotLocalizationScreen';
 import StreamingCameraScreen from './StreamingCameraScreen';
 import AppThemeContext from '../contexts/AppThemeContext';
 import RNGamePad from 'react-native-game-pad';
+import ROSLIB from 'roslib';
+import RosSettingsContext from '../contexts/RosSettingsContext';
 
 const RobotControlScreen = props => {
+  const rosSettingsContext = useContext(RosSettingsContext);
   const getScreenOrientation = () => {
     return Dimensions.get('screen').width >= Dimensions.get('screen').height
       ? 'landscape'
       : 'portrait';
   };
   const theme = useContext(AppThemeContext);
+  const [robotMovement, setRobotMovement] = useState({linear: 0, angular: 0});
   const [switchViewIsEnable, setSwitchViewEnable] = useState(false);
   const [switchGyroscopeIsEnable, setSwitchGyroscopeEnable] = useState(false);
   const [screenOrientation, setScreenOrientation] = useState(
@@ -23,6 +27,25 @@ const RobotControlScreen = props => {
       setScreenOrientation(getScreenOrientation());
     });
   }, []);
+
+  // Send cmd_vel command only if the joysticks or gyroscope change values
+  useEffect(() => {
+    if (rosSettingsContext.rosSettings.cmd_vel_publisher !== null) {
+      let twist = new ROSLIB.Message({
+        linear: {
+          x: robotMovement.linear,
+          y: 0.0,
+          z: 0,
+        },
+        angular: {
+          x: 0.0,
+          y: 0.0,
+          z: robotMovement.angular,
+        },
+      });
+      rosSettingsContext.rosSettings.cmd_vel_publisher.publish(twist);
+    }
+  }, [robotMovement]);
 
   return (
     <View style={styles.mainViewStyle}>
@@ -86,6 +109,18 @@ const RobotControlScreen = props => {
           width: 150,
         }}>
         <RNGamePad
+          onLeftEnd={() => {
+            setRobotMovement({linear: 0, angular: robotMovement.angular});
+          }}
+          onLeftMove={(evt, data) => {
+            if (typeof data.direction.angle !== 'undefined') {
+              const value = data.distance / 200;
+              setRobotMovement({
+                linear: data.direction.angle === 'down' ? value * -1 : value,
+                angular: robotMovement.angular,
+              });
+            }
+          }}
           options={{
             size: 100,
             color: 'red',
@@ -105,6 +140,19 @@ const RobotControlScreen = props => {
             width: 150,
           }}>
           <RNGamePad
+            onLeftEnd={() => {
+              setRobotMovement({linear: robotMovement.linear, angular: 0});
+            }}
+            onLeftMove={(evt, data) => {
+              if (typeof data.direction.angle !== 'undefined') {
+                const value = data.distance / 125;
+                setRobotMovement({
+                  linear: robotMovement.linear,
+                  angular:
+                    data.direction.angle === 'right' ? value * -1 : value,
+                });
+              }
+            }}
             options={{
               size: 100,
               color: 'red',
@@ -115,7 +163,9 @@ const RobotControlScreen = props => {
           />
         </View>
       ) : (
-        <View></View>
+        <View>
+
+        </View>
       )}
     </View>
   );
