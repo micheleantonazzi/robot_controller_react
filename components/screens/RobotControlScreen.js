@@ -1,11 +1,20 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, Switch, Text, Dimensions} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Switch,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import RobotLocalizationScreen from './RobotLocalizationScreen';
 import StreamingCameraScreen from './StreamingCameraScreen';
 import AppThemeContext from '../contexts/AppThemeContext';
 import RNGamePad from 'react-native-game-pad';
 import ROSLIB from 'roslib';
 import RosSettingsContext from '../contexts/RosSettingsContext';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faArrowsAltH} from '@fortawesome/free-solid-svg-icons';
 
 const RobotControlScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
@@ -21,6 +30,7 @@ const RobotControlScreen = props => {
   const [screenOrientation, setScreenOrientation] = useState(
     getScreenOrientation(),
   );
+  const [gyroscopeEnabled, setGyroscopeEnabled] = useState(false);
 
   useEffect(() => {
     Dimensions.addEventListener('change', () => {
@@ -163,8 +173,27 @@ const RobotControlScreen = props => {
           />
         </View>
       ) : (
-        <View>
-
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 39,
+            right: 30,
+            borderRadius: 50,
+            padding: 15,
+            backgroundColor: gyroscopeEnabled
+              ? theme.colors.secondary
+              : theme.colors.gyroscopeDisabled,
+          }}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPressIn={() => setGyroscopeEnabled(true)}
+            onPressOut={() => setGyroscopeEnabled(false)}>
+            <FontAwesomeIcon
+              icon={faArrowsAltH}
+              size={45}
+              color={theme.colors.text}
+            />
+          </TouchableOpacity>
         </View>
       )}
     </View>

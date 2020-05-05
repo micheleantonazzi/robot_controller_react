@@ -9,5 +9,6 @@ export const AppThemeDark = {
     textDark: '#949c9f',
     border: '#0eab9a',
     statusBar: '#232d36',
+    gyroscopeDisabled: '#ff6e40',
   },
 };
