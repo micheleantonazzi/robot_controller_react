@@ -31,7 +31,9 @@
     "react-native-webview": "^9.2.1",
     "rn-orientation-view": "^1.0.3",
     "roslib": "^1.1.0",
-    "react-native-game-pad": "micheleantonazzi/react-native-game-pad"
+    "react-native-game-pad": "micheleantonazzi/react-native-game-pad",
+    "react-native-sensors": "micheleantonazzi/react-native-sensors",
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
