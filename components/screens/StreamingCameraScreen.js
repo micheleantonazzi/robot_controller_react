@@ -60,12 +60,11 @@ const StreamingCameraScreen = props => {
     }
   };
 
-  const onScreenDimensionChange = () => {
-    calculateWebViewDimension(webViewDimension.width > 0);
+  const onScreenDimensionChange = (show) => {
+    calculateWebViewDimension(show);
   };
 
   useEffect(() => {
-    Dimensions.addEventListener('change', onScreenDimensionChange);
     Dimensions.addEventListener('change', () => {
       setScreenOrientation(getScreenOrientation());
     });
@@ -84,7 +83,6 @@ const StreamingCameraScreen = props => {
       rosSettingsContext.rosSettings.camera_info_listener.subscribe(function(
         message,
       ) {
-        console.log(message);
         setCameraDimension({
           width: message.width,
           height: message.height,
@@ -96,7 +94,7 @@ const StreamingCameraScreen = props => {
   }, [rosSettingsContext.rosSettings.camera_info_listener]);
 
   useEffect(() => {
-    calculateWebViewDimension(true);
+    calculateWebViewDimension(false);
     Dimensions.addEventListener('change', onScreenDimensionChange);
   }, [cameraDimension]);
 
@@ -129,13 +127,24 @@ const StreamingCameraScreen = props => {
         source={createUri()}
         scrollEnabled={false}
         cacheEnabled={false}
-        onError={() => calculateWebViewDimension(false)}
+        onError={() => {
+          calculateWebViewDimension(false);
+          Dimensions.addEventListener('change', () =>
+            calculateWebViewDimension(false),
+          );
+        }}
         onLoadStart={e => {
           if (e.nativeEvent.loading === true) {
+            Dimensions.addEventListener('change', () =>
+              calculateWebViewDimension(true),
+            );
             calculateWebViewDimension(true);
           }
         }}
         onLoadEnd={e => {
+          Dimensions.addEventListener('change', () =>
+            calculateWebViewDimension(false),
+          );
           calculateWebViewDimension(false);
         }}
       />
