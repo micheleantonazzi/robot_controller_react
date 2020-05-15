@@ -15,6 +15,13 @@ import ROSLIB from 'roslib';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faArrowsAltH} from '@fortawesome/free-solid-svg-icons';
+import {
+  setUpdateIntervalForType,
+  SensorTypes,
+  absoluterotationvector,
+} from 'react-native-sensors';
+
+setUpdateIntervalForType(SensorTypes.absoluterotationvector, 100);
 
 const RobotControlScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
@@ -30,7 +37,9 @@ const RobotControlScreen = props => {
   const [screenOrientation, setScreenOrientation] = useState(
     getScreenOrientation(),
   );
-  const [gyroscopeEnabled, setGyroscopeEnabled] = useState(false);
+  const [rotationVectorEnabled, setRotationVectorEnabled] = useState(false);
+  const [rotationVectorValue, setRotationVectorValue] = useState(0);
+  const [rotationVectorHandle, setRotationVectorHandle] = useState(null);
 
   useEffect(() => {
     Dimensions.addEventListener('change', () => {
@@ -55,7 +64,7 @@ const RobotControlScreen = props => {
       });
       rosSettingsContext.rosSettings.cmd_vel_publisher.publish(twist);
     }
-  }, [robotMovement]);
+  }, [robotMovement, rosSettingsContext.rosSettings.cmd_vel_publisher]);
 
   return (
     <View style={styles.mainViewStyle}>
@@ -123,7 +132,7 @@ const RobotControlScreen = props => {
             setRobotMovement({linear: 0, angular: robotMovement.angular});
           }}
           onLeftMove={(evt, data) => {
-            if (typeof data.direction.angle !== 'undefined') {
+            if (data.direction) {
               const value = data.distance / 200;
               setRobotMovement({
                 linear: data.direction.angle === 'down' ? value * -1 : value,
@@ -154,7 +163,7 @@ const RobotControlScreen = props => {
               setRobotMovement({linear: robotMovement.linear, angular: 0});
             }}
             onLeftMove={(evt, data) => {
-              if (typeof data.direction.angle !== 'undefined') {
+              if (data.direction) {
                 const value = data.distance / 125;
                 setRobotMovement({
                   linear: robotMovement.linear,
@@ -178,22 +187,64 @@ const RobotControlScreen = props => {
             position: 'absolute',
             bottom: 39,
             right: 30,
-            borderRadius: 50,
-            padding: 15,
-            backgroundColor: gyroscopeEnabled
-              ? theme.colors.secondary
-              : theme.colors.gyroscopeDisabled,
+            alignItems: 'center',
           }}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPressIn={() => setGyroscopeEnabled(true)}
-            onPressOut={() => setGyroscopeEnabled(false)}>
-            <FontAwesomeIcon
-              icon={faArrowsAltH}
-              size={45}
-              color={theme.colors.text}
-            />
-          </TouchableOpacity>
+          <Text
+            style={{
+              color: theme.colors.text,
+              marginBottom: 15,
+              fontSize: 25,
+            }}>
+            {rotationVectorValue}%
+          </Text>
+          <View
+            style={{
+              borderRadius: 50,
+              padding: 15,
+              backgroundColor: rotationVectorEnabled
+                ? theme.colors.secondary
+                : theme.colors.gyroscopeDisabled,
+            }}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPressIn={() => {
+                setRotationVectorEnabled(true);
+                const rotationVectorSubscription = absoluterotationvector.subscribe(
+                  ({x, y, z, timestamp}) => {
+                    let newZ = z;
+                    if (z < -Math.PI / 2) {
+                      newZ = -Math.PI / 2;
+                    } else if (z > Math.PI / 2) {
+                      newZ = Math.PI / 2;
+                    }
+                    let value = Math.round((newZ * 180) / Math.PI);
+                    setRotationVectorValue(value);
+                    setRobotMovement({
+                      linear: robotMovement.linear,
+                      angular: newZ * -1,
+                    });
+                  },
+                );
+                setRotationVectorHandle(rotationVectorSubscription);
+              }}
+              onPressOut={() => {
+                setRotationVectorEnabled(false);
+                if (rotationVectorHandle !== null) {
+                  rotationVectorHandle.unsubscribe();
+                }
+                setRotationVectorValue(0);
+                setRobotMovement({
+                  linear: robotMovement.linear,
+                  angular: 0,
+                });
+              }}>
+              <FontAwesomeIcon
+                icon={faArrowsAltH}
+                size={45}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
