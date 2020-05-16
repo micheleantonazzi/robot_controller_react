@@ -9,7 +9,9 @@ const TextInputStyled = props => {
     <TextInput
       {...props}
       style={{
-        borderColor: theme.colors.border,
+        borderBottomColor: theme.colors.border,
+        borderBottomWidth: 1,
+        paddingBottom: 4,
         color: theme.colors.text,
         ...props.style,
       }}
