@@ -75,9 +75,9 @@ const RobotControlScreen = props => {
             : styles.switchMapCameraViewRightStyle
         }>
         {switchViewIsEnable ? (
-          <Text style={{color: theme.colors.text}}>Show map</Text>
-        ) : (
           <Text style={{color: theme.colors.text}}>Show camera</Text>
+        ) : (
+          <Text style={{color: theme.colors.text}}>Show map</Text>
         )}
         <Switch
           onValueChange={() => setSwitchViewEnable(!switchViewIsEnable)}
