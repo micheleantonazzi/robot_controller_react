@@ -6,7 +6,7 @@ export const AppThemeDark = {
     card: '#232d36',
     text: '#ffffff',
     textMedium: '#d5d6d8',
-    textDark: '#949c9f',
+    textDark: '#c4c4c4c4',
     border: '#0eab9a',
     statusBar: '#232d36',
     gyroscopeDisabled: '#ff6e40',
