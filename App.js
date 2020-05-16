@@ -14,13 +14,15 @@ import {Strings} from './components/definitions/Strings';
 import HeaderLeftStyled from './components/styledComponets/HeaderLeftStyled';
 import DrawerContentStyled from './components/styledComponets/DrawerContentStyled';
 import StreamingCameraScreen from './components/screens/StreamingCameraScreen';
-import RobotControlScreen from "./components/screens/RobotControlScreen";
+import RobotControlScreen from './components/screens/RobotControlScreen';
+import SettingsScreen from './components/screens/SettingsScreen';
 
 // Navigators
 const ModalStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const RobotControllerStack = createStackNavigator();
 const StreamingCameraStack = createStackNavigator();
+const SettingsStack = createStackNavigator();
 
 // Get drawer navigator
 const getDrawerNavigator = () => (
@@ -41,6 +43,11 @@ const getDrawerNavigator = () => (
       name={Strings.stackNavigatorRobotControlScreenName}
       component={getRobotControlNavigator}
       options={{drawerLabel: Strings.robotControlScreenItemName}}
+    />
+    <Drawer.Screen
+      name={Strings.stackNavigatorSettingsScreenName}
+      component={getSettingsNavigator}
+      options={{drawerLabel: Strings.settingsScreenItemName}}
     />
   </Drawer.Navigator>
 );
@@ -85,6 +92,20 @@ const getRobotControlNavigator = () => (
       }}
     />
   </StreamingCameraStack.Navigator>
+);
+
+// Get settingsScreen navigator
+const getSettingsNavigator = () => (
+  <SettingsStack.Navigator>
+    <SettingsStack.Screen
+      name={Strings.settingsScreenName}
+      component={SettingsScreen}
+      options={{
+        title: Strings.settingsScreenItemName,
+        headerLeft: ({}) => <HeaderLeftStyled />,
+      }}
+    />
+  </SettingsStack.Navigator>
 );
 
 const App = () => {

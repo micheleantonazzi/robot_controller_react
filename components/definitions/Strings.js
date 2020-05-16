@@ -7,15 +7,18 @@ export const Strings = {
   stackNavigatorLocalizationScreenName: 'stackNavigationLocalizationScreen',
   stackNavigatorStreamingCameraScreenName: 'stackNavigatorStreamingCamera',
   stackNavigatorRobotControlScreenName: 'stackNavigationRobotControl',
+  stackNavigatorSettingsScreenName: 'stackNavigatorSettings',
 
   // Screen names
   rosConnectionScreenName: 'rosConnectionScreen',
   robotLocalizationScreenName: 'robotVisualizationScreen',
   streamingCameraScreenName: 'streamingCameraScreen',
   robotControlScreenName: 'robotControlScreen',
+  settingsScreenName: 'settingsScreen',
 
   // Menu items
   robotLocalizationScreenItemName: 'Robot localization',
   streamingCameraScreenItemName: 'Streaming camera',
   robotControlScreenItemName: 'Robot Control',
+  settingsScreenItemName: 'Settings',
 };
