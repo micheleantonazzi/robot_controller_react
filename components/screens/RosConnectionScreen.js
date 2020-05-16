@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
+  Text,
 } from 'react-native';
 import ButtonStyled from '../styledComponets/ButtonStyled';
 import RosSettingsContext from '../contexts/RosSettingsContext';
@@ -172,9 +173,9 @@ const RosConnectionScreen = props => {
           Keyboard.dismiss();
         }}>
         <View>
-          <TextInputStyled style={styles.titleTextStyle}>
+          <Text style={{color: theme.colors.text, ...styles.titleTextStyle}}>
             Connect to master
-          </TextInputStyled>
+          </Text>
           <View>
             <Spinner
               visible={isVisibleSpinner}
