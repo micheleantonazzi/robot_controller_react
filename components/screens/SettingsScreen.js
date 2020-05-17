@@ -107,7 +107,7 @@ const SettingsScreen = props => {
 
   return (
     <View style={styles.mainViewStyle}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps={'handled'}>
         <Text style={{color: theme.colors.textDark, ...styles.textStyle}}>
           Map topic
         </Text>
