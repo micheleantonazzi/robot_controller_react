@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   switchMapCameraViewRightStyle: {
     position: 'absolute',
     top: 20,
-    right: 20,
+    right: 30,
     zIndex: 1,
     alignItems: 'center',
   },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   switchGyroscopeViewLandscapeStyle: {
     position: 'absolute',
     bottom: 160,
-    left: 20,
+    left: 30,
     zIndex: 1,
     alignItems: 'center',
   },
