@@ -115,6 +115,7 @@ const SettingsScreen = props => {
           style={{fontSize: 17, ...styles.textInputStyle}}
           value={mapTopicValue}
           onChangeText={text => setMapTopicValue(text)}
+          autoCapitalize={'none'}
         />
 
         <Text style={{color: theme.colors.textDark, ...styles.textStyle}}>
@@ -124,6 +125,7 @@ const SettingsScreen = props => {
           style={{fontSize: 17, ...styles.textInputStyle}}
           value={poseTopicValue}
           onChangeText={text => setPoseTopicValue(text)}
+          autoCapitalize={'none'}
         />
 
         <Text style={{color: theme.colors.textDark, ...styles.textStyle}}>
@@ -133,6 +135,7 @@ const SettingsScreen = props => {
           style={{fontSize: 17, ...styles.textInputStyle}}
           value={cameraUrlValue}
           onChangeText={text => setCameraUrlValue(text)}
+          autoCapitalize={'none'}
         />
 
         <Text style={{color: theme.colors.textDark, ...styles.textStyle}}>
@@ -142,6 +145,7 @@ const SettingsScreen = props => {
           style={{fontSize: 17, ...styles.textInputStyle}}
           value={controlTopicValue}
           onChangeText={text => setControlTopicValue(text)}
+          autoCapitalize={'none'}
         />
         <View style={styles.buttonBoxStyle}>
           <View style={{marginRight: 15}}>
