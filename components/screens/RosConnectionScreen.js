@@ -16,7 +16,6 @@ import {Strings} from '../definitions/Strings';
 import SimpleToast from 'react-native-simple-toast';
 import Spinner from 'react-native-loading-spinner-overlay';
 import AppThemeContext from '../contexts/AppThemeContext';
-import TextInputStyled from '../styledComponets/TextInputStyled';
 
 const RosConnectionScreen = props => {
   const theme = useContext(AppThemeContext);
