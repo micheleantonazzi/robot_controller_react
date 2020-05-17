@@ -27,7 +27,7 @@ const RosConnectionScreen = props => {
 
   // Runs only after the first render and it load the urlCollection
   useEffect(() => {
-    const promise = AsyncStorage.getItem('urlCollection');
+    const promise = AsyncStorage.getItem(Strings.urlCollectionKey);
     promise
       .then(ret => {
         if (ret === null) {
@@ -61,7 +61,7 @@ const RosConnectionScreen = props => {
       if (urlCollection.includes(address) === false) {
         setUrlCollection(urlCollection.concat([address]).slice(0, 5));
         AsyncStorage.setItem(
-          'urlCollection',
+          Strings.urlCollectionKey,
           JSON.stringify(urlCollection.concat([address]).slice(0, 5)),
         )
           .catch(e => console.log(e))
