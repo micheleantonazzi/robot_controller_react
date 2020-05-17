@@ -22,7 +22,7 @@ const StreamingCameraScreen = props => {
   // Create the uri for the web view
   const createUri = () => {
     return isFocused
-      ? {uri: 'http://192.168.1.81:8089/stream?topic=/usb_cam/image_raw'}
+      ? {uri: rosSettingsContext.rosSettings.camera_url}
       : {uri: ''};
   };
   const [webViewDimension, setWebViewDimension] = useState(
@@ -52,8 +52,7 @@ const StreamingCameraScreen = props => {
         });
       } else {
         setWebViewDimension({
-          width:
-            screenHeight + 20,
+          width: screenHeight + 20,
           height: screenHeight,
         });
       }

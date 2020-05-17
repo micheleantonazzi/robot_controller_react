@@ -92,7 +92,11 @@ const RobotLocalizationScreen = props => {
   useEffect(() => {
     createMapListener();
     createPoseListener();
-  }, [rosSettingsContext.rosSettings.ros_connector]);
+  }, [
+    rosSettingsContext.rosSettings.ros_connector,
+    rosSettingsContext.rosSettings.map_topic,
+    rosSettingsContext.rosSettings.pose_topic,
+  ]);
 
   // Generate the map image if the map message changes
   useEffect(() => {
