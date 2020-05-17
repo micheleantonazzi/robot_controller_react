@@ -1,9 +1,18 @@
 import React, {useContext, useState} from 'react';
-import {View, Text, ScrollView, StyleSheet, Button} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Button,
+  AsyncStorage,
+} from 'react-native';
 import AppThemeContext from '../contexts/AppThemeContext';
 import TextInputStyled from '../styledComponets/TextInputStyled';
 import RosSettingsContext from '../contexts/RosSettingsContext';
 import ButtonStyled from '../styledComponets/ButtonStyled';
+import {Strings} from '../definitions/Strings';
+import SimpleToast from 'react-native-simple-toast';
 
 const SettingsScreen = props => {
   const theme = useContext(AppThemeContext);
@@ -21,6 +30,35 @@ const SettingsScreen = props => {
   const [controlTopicValue, setControlTopicValue] = useState(
     rosSettingsContext.rosSettings.control_topic,
   );
+
+  const saveSettings = () => {
+    AsyncStorage.multiSet([
+      [Strings.mapTopicKey, JSON.stringify(mapTopicValue)],
+      [Strings.poseTopicKey, JSON.stringify(poseTopicValue)],
+      [Strings.cameraUrlKey, JSON.stringify(cameraUrlValue)],
+      [Strings.controlTopicKey, JSON.stringify(controlTopicValue)],
+    ])
+      .catch(e => console.log(e))
+      .done();
+
+    rosSettingsContext.changeProperty([
+      {name: 'map_topic', value: mapTopicValue},
+      {name: 'pose_topic', value: poseTopicValue},
+      {name: 'camera_url', value: cameraUrlValue},
+      {name: 'control_topic', value: controlTopicValue},
+    ]);
+
+    SimpleToast.show('Saved new settings');
+  };
+
+  const resetSettings = () => {
+    setMapTopicValue(rosSettingsContext.rosSettings.map_topic);
+    setPoseTopicValue(rosSettingsContext.rosSettings.pose_topic);
+    setCameraUrlValue(rosSettingsContext.rosSettings.camera_url);
+    setControlTopicValue(rosSettingsContext.rosSettings.control_topic);
+
+    SimpleToast.show('New settings discarded');
+  };
 
   return (
     <View style={styles.mainViewStyle}>
@@ -64,11 +102,18 @@ const SettingsScreen = props => {
           <View style={{marginRight: 15}}>
             <Button
               title={'Reset'}
-              onPress={() => {}}
+              onPress={() => {
+                resetSettings();
+              }}
               color={theme.colors.gyroscopeDisabled}
             />
           </View>
-          <ButtonStyled title={'Save'} onPress={() => {}} />
+          <ButtonStyled
+            title={'Save'}
+            onPress={() => {
+              saveSettings();
+            }}
+          />
         </View>
       </ScrollView>
     </View>
