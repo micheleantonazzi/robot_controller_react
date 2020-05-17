@@ -87,14 +87,14 @@ const RosConnectionScreen = props => {
         // Create map listener
         const newMapListener = new ROSLIB.Topic({
           ros: ros,
-          name: '/map',
+          name: rosSettingsContext.rosSettings.map_topic,
           messageType: 'nav_msgs/OccupancyGrid',
         });
 
         // Create pose listener
         const newPoseListener = new ROSLIB.Topic({
           ros: ros,
-          name: '/amcl_pose',
+          name: rosSettingsContext.rosSettings.pose_topic,
           messageType: 'geometry_msgs/PoseWithCovarianceStamped',
         });
 
@@ -108,7 +108,7 @@ const RosConnectionScreen = props => {
         // Create cmd_vel publisher
         const newCmdVelPublisher = new ROSLIB.Topic({
           ros: ros,
-          name: '/cmd_vel',
+          name: rosSettingsContext.rosSettings.control_topic,
           messageType: 'geometry_msgs/Twist',
         });
 
