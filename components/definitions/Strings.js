@@ -21,4 +21,11 @@ export const Strings = {
   streamingCameraScreenItemName: 'Streaming camera',
   robotControlScreenItemName: 'Robot Control',
   settingsScreenItemName: 'Settings',
+
+  // Storage key
+  urlCollectionKey: 'urlCollection',
+  mapTopicKey: 'map_topic_key',
+  poseTopicKey: 'pose_topic_key',
+  cameraUrlKey: 'camera_url_key',
+  controlTopicKey: 'control_topic_key',
 };
