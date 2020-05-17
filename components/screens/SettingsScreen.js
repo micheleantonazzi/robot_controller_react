@@ -13,6 +13,7 @@ import RosSettingsContext from '../contexts/RosSettingsContext';
 import ButtonStyled from '../styledComponets/ButtonStyled';
 import {Strings} from '../definitions/Strings';
 import SimpleToast from 'react-native-simple-toast';
+import ROSLIB from 'roslib';
 
 const SettingsScreen = props => {
   const theme = useContext(AppThemeContext);
@@ -41,7 +42,51 @@ const SettingsScreen = props => {
       .catch(e => console.log(e))
       .done();
 
+    if (rosSettingsContext.rosSettings.map_listener !== null) {
+      rosSettingsContext.rosSettings.map_listener.unsubscribe();
+    }
+
+    if (rosSettingsContext.rosSettings.pose_listener !== null) {
+      rosSettingsContext.rosSettings.pose_listener.unsubscribe();
+    }
+
+    if (rosSettingsContext.rosSettings.camera_info_listener !== null) {
+      rosSettingsContext.rosSettings.camera_info_listener.unsubscribe();
+    }
+
+    // Create map listener
+    const newMapListener = new ROSLIB.Topic({
+      ros: rosSettingsContext.rosSettings.ros_connector,
+      name: mapTopicValue,
+      messageType: 'nav_msgs/OccupancyGrid',
+    });
+
+    // Create pose listener
+    const newPoseListener = new ROSLIB.Topic({
+      ros: rosSettingsContext.rosSettings.ros_connector,
+      name: poseTopicValue,
+      messageType: 'geometry_msgs/PoseWithCovarianceStamped',
+    });
+
+    // Create camera info listener
+    const newCameraInfoListener = new ROSLIB.Topic({
+      ros: rosSettingsContext.rosSettings.ros_connector,
+      name: '/usb_cam/camera_info',
+      messageType: 'sensor_msgs/CameraInfo',
+    });
+
+    // Create cmd_vel publisher
+    const newCmdVelPublisher = new ROSLIB.Topic({
+      ros: rosSettingsContext.rosSettings.ros_connector,
+      name: controlTopicValue,
+      messageType: 'geometry_msgs/Twist',
+    });
+
     rosSettingsContext.changeProperty([
+      {name: 'map_listener', value: newMapListener},
+      {name: 'pose_listener', value: newPoseListener},
+      {name: 'camera_info_listener', value: newCameraInfoListener},
+      {name: 'cmd_vel_publisher', value: newCmdVelPublisher},
       {name: 'map_topic', value: mapTopicValue},
       {name: 'pose_topic', value: poseTopicValue},
       {name: 'camera_url', value: cameraUrlValue},
