@@ -24,8 +24,8 @@ export const Strings = {
 
   // Storage key
   urlCollectionKey: 'urlCollection',
-  mapTopicKey: 'map_topic_key',
-  poseTopicKey: 'pose_topic_key',
-  cameraUrlKey: 'camera_url_key',
-  controlTopicKey: 'control_topic_key',
+  mapTopicKey: 'map_topic',
+  poseTopicKey: 'pose_topic',
+  cameraUrlKey: 'camera_url',
+  controlTopicKey: 'control_topic',
 };
