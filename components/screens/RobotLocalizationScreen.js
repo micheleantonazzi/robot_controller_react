@@ -1,19 +1,12 @@
-import React, {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import 'react-native-get-random-values';
 import {Dimensions, View} from 'react-native';
 import {Strings} from '../definitions/Strings';
 import RosSettingsContext from '../contexts/RosSettingsContext';
-import ROSLIB from 'roslib';
 import Canvas, {ImageData, Image as CanvasImage} from 'react-native-canvas';
 import {useHeaderHeight} from '@react-navigation/stack';
-import {useFocusEffect} from '@react-navigation/native';
 import AppThemeContext from '../contexts/AppThemeContext';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const RobotLocalizationScreen = props => {
   const rosSettingsContext = useContext(RosSettingsContext);
@@ -255,6 +248,30 @@ const RobotLocalizationScreen = props => {
       context.fill();
     }
   };
+
+  useEffect(() => {
+    const promiseMultiGet = AsyncStorage.multiGet([
+      Strings.mapTopicKey,
+      Strings.poseTopicKey,
+      Strings.cameraUrlKey,
+      Strings.controlTopicKey,
+    ]);
+    promiseMultiGet
+      .then(ret => {
+        const settings = [];
+        ret.forEach(item => {
+          if (item[1] !== null) {
+            settings.push({
+              name: item[0],
+              value: JSON.parse(item[1]).substring(0, item[1].length - 1),
+            });
+          }
+        });
+        rosSettingsContext.changeProperty(settings);
+      })
+      .catch(e => console.log(e))
+      .done();
+  }, []);
 
   return (
     <View
